@@ -11,6 +11,7 @@ import { ExpensesList } from './components/ExpensesList'
 import { StocksList } from './components/StocksList'
 import { CryptoList } from './components/CryptoList'
 import { P2PLendingList } from './components/P2PLendingList'
+import { ElectricityList } from './components/ElectricityList'
 import { Settings } from './components/Settings'
 import { CreditCard, TrendingUp } from 'lucide-react'
 
