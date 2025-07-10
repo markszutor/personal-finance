@@ -14,7 +14,8 @@ import {
   Plus,
   BarChart3,
   Bitcoin,
-  Building2
+  Building2,
+  Zap
 } from 'lucide-react'
 
 interface LayoutProps {
@@ -31,6 +32,7 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
     { name: 'Dashboard', id: 'dashboard', icon: Home },
     { name: 'Income', id: 'income', icon: TrendingUp },
     { name: 'Expenses', id: 'expenses', icon: TrendingDown },
+    { name: 'Electricity', id: 'electricity', icon: Zap },
     { name: 'Stocks', id: 'stocks', icon: BarChart3 },
     { name: 'Crypto', id: 'crypto', icon: Bitcoin },
     { name: 'P2P Lending', id: 'p2p_lending', icon: Building2 },
