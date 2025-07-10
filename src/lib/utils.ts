@@ -20,6 +20,34 @@ export function formatDate(date: string | Date): string {
   }).format(new Date(date))
 }
 
+export function formatDateWithPreference(date: string | Date, format: string = 'MM/dd/yyyy'): string {
+  const dateObj = new Date(date)
+  
+  switch (format) {
+    case 'MM/dd/yyyy':
+      return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(dateObj)
+    case 'dd/MM/yyyy':
+      return new Intl.DateTimeFormat('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(dateObj)
+    case 'yyyy-MM-dd':
+      return dateObj.toISOString().split('T')[0]
+    case 'dd-MM-yyyy':
+      const day = dateObj.getDate().toString().padStart(2, '0')
+      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0')
+      const year = dateObj.getFullYear()
+      return `${day}-${month}-${year}`
+    default:
+      return formatDate(date)
+  }
+}
+
 export function formatDateTime(date: string | Date): string {
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',

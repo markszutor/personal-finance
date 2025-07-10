@@ -322,7 +322,7 @@ export function InvestmentForm({ onClose }: InvestmentFormProps) {
           {/* Quantity and Purchase Price */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr 120px',
+            gridTemplateColumns: '1fr 1fr 1fr',
             gap: '16px'
           }}>
             <div>
@@ -484,10 +484,14 @@ export function InvestmentForm({ onClose }: InvestmentFormProps) {
                     e.target.style.backgroundColor = '#fafafa'
                   }}
                 >
-                  {CURRENCIES.map(currency => (
+                  {/* Default currency first */}
+                  <option value={defaultCurrency}>
+                    {defaultCurrency} (Default)
+                  </option>
+                  {/* Other currencies */}
+                  {CURRENCIES.filter(currency => currency !== defaultCurrency).map(currency => (
                     <option key={currency} value={currency}>
                       {currency}
-                      {currency === defaultCurrency && ' (Default)'}
                     </option>
                   ))}
                 </select>

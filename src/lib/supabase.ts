@@ -224,6 +224,7 @@ export type Database = {
           id: string
           user_id: string
           default_currency: string
+          date_format: string
           created_at: string
           updated_at: string
         }
@@ -231,6 +232,7 @@ export type Database = {
           id?: string
           user_id: string
           default_currency?: string
+          date_format?: string
           created_at?: string
           updated_at?: string
         }
@@ -238,6 +240,7 @@ export type Database = {
           id?: string
           user_id?: string
           default_currency?: string
+          date_format?: string
           created_at?: string
           updated_at?: string
         }

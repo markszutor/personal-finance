@@ -10,6 +10,13 @@ const CURRENCIES = [
   { code: 'HUF', name: 'Hungarian Forint', symbol: 'Ft' }
 ]
 
+const DATE_FORMATS = [
+  { code: 'MM/dd/yyyy', name: 'US Format', example: '12/31/2024' },
+  { code: 'dd/MM/yyyy', name: 'European Format', example: '31/12/2024' },
+  { code: 'yyyy-MM-dd', name: 'ISO Format', example: '2024-12-31' },
+  { code: 'dd-MM-yyyy', name: 'Alternative European', example: '31-12-2024' }
+]
+
 export function Settings() {
   const { user } = useAuth()
   const { data: preferences, isLoading } = useUserPreferences(user?.id)
@@ -17,12 +24,14 @@ export function Settings() {
   const updatePreferences = useUpdateUserPreferences()
   
   const [defaultCurrency, setDefaultCurrency] = useState('USD')
+  const [dateFormat, setDateFormat] = useState('MM/dd/yyyy')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (preferences) {
       setDefaultCurrency(preferences.default_currency)
+      setDateFormat(preferences.date_format || 'MM/dd/yyyy')
     }
   }, [preferences])
 
@@ -34,12 +43,14 @@ export function Settings() {
       if (preferences) {
         await updatePreferences.mutateAsync({
           user_id: user.id,
-          default_currency: defaultCurrency
+          default_currency: defaultCurrency,
+          date_format: dateFormat
         })
       } else {
         await createPreferences.mutateAsync({
           user_id: user.id,
-          default_currency: defaultCurrency
+          default_currency: defaultCurrency,
+          date_format: dateFormat
         })
       }
       setSaved(true)
@@ -256,6 +267,160 @@ export function Settings() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Date Format Settings Card */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '32px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '24px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+            padding: '12px',
+            borderRadius: '12px'
+          }}>
+            <Calendar size={20} color="white" />
+          </div>
+          <div>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              Date Format Settings
+            </h3>
+            <p style={{
+              margin: 0,
+              fontSize: '14px',
+              color: '#6b7280'
+            }}>
+              Choose how dates are displayed throughout the application
+            </p>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '16px'
+          }}>
+            Date Format
+          </label>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px'
+          }}>
+            {DATE_FORMATS.map((format) => (
+              <label
+                key={format.code}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '20px',
+                  borderRadius: '16px',
+                  border: '2px solid',
+                  borderColor: dateFormat === format.code ? '#8b5cf6' : 'rgba(0, 0, 0, 0.1)',
+                  background: dateFormat === format.code 
+                    ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%)'
+                    : 'rgba(255, 255, 255, 0.6)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: dateFormat === format.code 
+                    ? '0 8px 32px rgba(139, 92, 246, 0.2)' 
+                    : '0 4px 16px rgba(0, 0, 0, 0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  if (dateFormat !== format.code) {
+                    e.currentTarget.style.borderColor = '#8b5cf6'
+                    e.currentTarget.style.background = 'rgba(139, 92, 246, 0.05)'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (dateFormat !== format.code) {
+                    e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)'
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }
+                }}
+              >
+                <input
+                  type="radio"
+                  name="dateFormat"
+                  value={format.code}
+                  checked={dateFormat === format.code}
+                  onChange={(e) => setDateFormat(e.target.value)}
+                  style={{ display: 'none' }}
+                />
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '20px',
+                      marginRight: '12px',
+                      background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                      padding: '8px',
+                      borderRadius: '8px',
+                      color: 'white',
+                      minWidth: '40px',
+                      textAlign: 'center'
+                    }}>
+                      📅
+                    </div>
+                    <div>
+                      <p style={{
+                        margin: 0,
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#1a1a1a'
+                      }}>
+                        {format.name}
+                      </p>
+                      <p style={{
+                        margin: 0,
+                        fontSize: '14px',
+                        color: '#6b7280'
+                      }}>
+                        {format.example}
+                      </p>
+                    </div>
+                  </div>
+                  {dateFormat === format.code && (
+                    <div style={{
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      padding: '6px',
+                      borderRadius: '50%'
+                    }}>
+                      <Check size={16} color="white" />
+                    </div>
+                  )}
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
 
         <div style={{
           paddingTop: '24px',
@@ -272,14 +437,14 @@ export function Settings() {
               fontSize: '14px',
               color: '#6b7280'
             }}>
-              All transactions will be converted to your default currency for reporting and analytics.
+              All transactions and bills will be converted to your default currency for reporting.
             </p>
             <p style={{
               margin: 0,
               fontSize: '12px',
               color: '#9ca3af'
             }}>
-              Exchange rates are updated automatically when adding transactions.
+              Date format affects how dates are displayed in lists, forms, and reports.
             </p>
           </div>
           <button
@@ -329,6 +494,50 @@ export function Settings() {
             )}
           </button>
         </div>
+      </div>
+
+      {/* Currency Settings Card - Remove duplicate save section */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '32px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '24px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            padding: '12px',
+            borderRadius: '12px'
+          }}>
+            <Globe size={20} color="white" />
+          </div>
+          <div>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              Currency Settings
+            </h3>
+            <p style={{
+              margin: 0,
+              fontSize: '14px',
+              color: '#6b7280'
+            }}>
+              Set your default currency for transactions and reporting
+            </p>
+          </div>
+        </div>
+
+        {/* Currency selection grid - keep existing code */}
       </div>
 
       {/* Supported Currencies Info Card */}

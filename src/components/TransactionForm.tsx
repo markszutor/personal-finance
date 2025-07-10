@@ -382,7 +382,7 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
           {/* Amount and Currency */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 120px',
+            gridTemplateColumns: '2fr 1fr',
             gap: '16px'
           }}>
             <div>
@@ -489,10 +489,14 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
                     e.target.style.backgroundColor = '#fafafa'
                   }}
                 >
-                  {CURRENCIES.map(currency => (
+                  {/* Default currency first */}
+                  <option value={defaultCurrency}>
+                    {defaultCurrency} (Default)
+                  </option>
+                  {/* Other currencies */}
+                  {CURRENCIES.filter(currency => currency !== defaultCurrency).map(currency => (
                     <option key={currency} value={currency}>
                       {currency}
-                      {currency === defaultCurrency && ' (Default)'}
                     </option>
                   ))}
                 </select>
