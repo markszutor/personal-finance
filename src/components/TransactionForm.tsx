@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useCreateTransaction } from '../hooks/useTransactions'
 import { useUserPreferences } from '../hooks/useUserPreferences'
 import { getExchangeRate } from '../lib/utils'
-import { X, DollarSign, TrendingUp, TrendingDown } from 'lucide-react'
+import { X, DollarSign, TrendingUp, TrendingDown, Tag, FileText, Globe } from 'lucide-react'
 
 interface TransactionFormProps {
   onClose: () => void
@@ -85,181 +85,537 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
   const categories = CATEGORIES[formData.type]
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/95 backdrop-blur-xl rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
-        <div className="flex items-center justify-between p-8 border-b border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-xl ${
-              formData.type === 'income' 
-                ? 'bg-green-100 text-green-600' 
-                : 'bg-red-100 text-red-600'
-            }`}>
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0, 0, 0, 0.5)',
+      backdropFilter: 'blur(8px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+      zIndex: 50,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+    }}>
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        maxWidth: '600px',
+        width: '100%',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '32px',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: formData.type === 'income' 
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' 
+                : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              padding: '12px',
+              borderRadius: '12px'
+            }}>
               {formData.type === 'income' ? (
-                <TrendingUp className="h-6 w-6" />
+                <TrendingUp size={24} color="white" />
               ) : (
-                <TrendingDown className="h-6 w-6" />
+                <TrendingDown size={24} color="white" />
               )}
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Add Transaction</h2>
-              <p className="text-sm text-gray-500">Track your {formData.type}</p>
+              <h2 style={{
+                margin: 0,
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#1a1a1a'
+              }}>
+                Add Transaction
+              </h2>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                Track your {formData.type}
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+            style={{
+              padding: '8px',
+              background: 'rgba(0, 0, 0, 0.05)',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'rgba(0, 0, 0, 0.05)'
+            }}
           >
-            <X className="h-6 w-6" />
+            <X size={20} color="#6b7280" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} style={{
+          padding: '32px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px'
+        }}>
+          {/* Transaction Type */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '12px'
+            }}>
               Transaction Type
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              <label className={`flex items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                formData.type === 'income'
-                  ? 'border-green-500 bg-green-50 text-green-700'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px'
+            }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '16px',
+                borderRadius: '12px',
+                border: '2px solid',
+                borderColor: formData.type === 'income' ? '#10b981' : 'rgba(0, 0, 0, 0.1)',
+                background: formData.type === 'income' 
+                  ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)'
+                  : 'rgba(255, 255, 255, 0.6)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                gap: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: formData.type === 'income' ? '#065f46' : '#6b7280'
+              }}>
                 <input
                   type="radio"
                   name="type"
                   value="income"
                   checked={formData.type === 'income'}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as 'income' | 'expense', category: '' })}
-                  className="sr-only"
+                  style={{ display: 'none' }}
                 />
-                <TrendingUp className="h-5 w-5 mr-2" />
+                <TrendingUp size={16} />
                 Income
               </label>
-              <label className={`flex items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                formData.type === 'expense'
-                  ? 'border-red-500 bg-red-50 text-red-700'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '16px',
+                borderRadius: '12px',
+                border: '2px solid',
+                borderColor: formData.type === 'expense' ? '#ef4444' : 'rgba(0, 0, 0, 0.1)',
+                background: formData.type === 'expense' 
+                  ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)'
+                  : 'rgba(255, 255, 255, 0.6)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                gap: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: formData.type === 'expense' ? '#7f1d1d' : '#6b7280'
+              }}>
                 <input
                   type="radio"
                   name="type"
                   value="expense"
                   checked={formData.type === 'expense'}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as 'income' | 'expense', category: '' })}
-                  className="sr-only"
+                  style={{ display: 'none' }}
                 />
-                <TrendingDown className="h-5 w-5 mr-2" />
+                <TrendingDown size={16} />
                 Expense
               </label>
             </div>
           </div>
 
+          {/* Title */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
               Title *
             </label>
-            <input
-              type="text"
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Enter transaction title"
-            />
+            <div style={{ position: 'relative' }}>
+              <FileText 
+                size={16} 
+                color="#9ca3af" 
+                style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)'
+                }}
+              />
+              <input
+                type="text"
+                required
+                style={{
+                  width: 'calc(100% - 32px)',
+                  boxSizing: 'border-box',
+                  paddingLeft: '44px',
+                  paddingRight: '16px',
+                  paddingTop: '16px',
+                  paddingBottom: '16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: '16px',
+                  outline: 'none',
+                  transition: 'all 0.2s ease',
+                  backgroundColor: '#fafafa'
+                }}
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter transaction title"
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#667eea'
+                  e.target.style.backgroundColor = '#ffffff'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb'
+                  e.target.style.backgroundColor = '#fafafa'
+                }}
+              />
+            </div>
           </div>
 
+          {/* Description */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
               Description
             </label>
             <textarea
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all min-h-[100px] resize-none"
+              style={{
+                width: 'calc(100% - 32px)',
+                boxSizing: 'border-box',
+                padding: '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '12px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'all 0.2s ease',
+                backgroundColor: '#fafafa',
+                minHeight: '100px',
+                resize: 'none',
+                fontFamily: 'inherit'
+              }}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Optional description"
+              onFocus={(e) => {
+                e.target.style.borderColor = '#667eea'
+                e.target.style.backgroundColor = '#ffffff'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e5e7eb'
+                e.target.style.backgroundColor = '#fafafa'
+              }}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Amount and Currency */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 120px',
+            gap: '16px'
+          }}>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
                 Amount *
               </label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div style={{ position: 'relative' }}>
+                <DollarSign 
+                  size={16} 
+                  color="#9ca3af" 
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)'
+                  }}
+                />
                 <input
                   type="number"
                   step="0.01"
                   min="0"
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  style={{
+                    width: 'calc(100% - 32px)',
+                    boxSizing: 'border-box',
+                    paddingLeft: '44px',
+                    paddingRight: '16px',
+                    paddingTop: '16px',
+                    paddingBottom: '16px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: '#fafafa'
+                  }}
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                   placeholder="0.00"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea'
+                    e.target.style.backgroundColor = '#ffffff'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.backgroundColor = '#fafafa'
+                  }}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
                 Currency
               </label>
+              <div style={{ position: 'relative' }}>
+                <Globe 
+                  size={16} 
+                  color="#9ca3af" 
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 1
+                  }}
+                />
+                <select
+                  style={{
+                    width: '100%',
+                    paddingLeft: '44px',
+                    paddingRight: '16px',
+                    paddingTop: '16px',
+                    paddingBottom: '16px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: '#fafafa',
+                    appearance: 'none',
+                    cursor: 'pointer'
+                  }}
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea'
+                    e.target.style.backgroundColor = '#ffffff'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.backgroundColor = '#fafafa'
+                  }}
+                >
+                  {CURRENCIES.map(currency => (
+                    <option key={currency} value={currency}>
+                      {currency}
+                      {currency === defaultCurrency && ' (Default)'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Category */}
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Category *
+            </label>
+            <div style={{ position: 'relative' }}>
+              <Tag 
+                size={16} 
+                color="#9ca3af" 
+                style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 1
+                }}
+              />
               <select
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  paddingLeft: '44px',
+                  paddingRight: '16px',
+                  paddingTop: '16px',
+                  paddingBottom: '16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: '16px',
+                  outline: 'none',
+                  transition: 'all 0.2s ease',
+                  backgroundColor: '#fafafa',
+                  appearance: 'none',
+                  cursor: 'pointer'
+                }}
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#667eea'
+                  e.target.style.backgroundColor = '#ffffff'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb'
+                  e.target.style.backgroundColor = '#fafafa'
+                }}
               >
-                {CURRENCIES.map(currency => (
-                  <option key={currency} value={currency}>
-                    {currency}
-                    {currency === defaultCurrency && ' (Default)'}
-                  </option>
+                <option value="">Select a category</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
                 ))}
               </select>
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Category *
-            </label>
-            <select
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            >
-              <option value="">Select a category</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
-
+          {/* Currency Conversion Notice */}
           {formData.currency !== defaultCurrency && formData.amount && (
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-              <p className="text-sm text-blue-700">
+            <div style={{
+              padding: '16px',
+              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+              borderRadius: '12px',
+              border: '1px solid rgba(102, 126, 234, 0.2)'
+            }}>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#4338ca',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <Globe size={16} />
                 <strong>Note:</strong> This transaction will be automatically converted from {formData.currency} to {defaultCurrency} using the current exchange rate.
               </p>
             </div>
           )}
 
-          <div className="flex space-x-4 pt-4">
+          {/* Action Buttons */}
+          <div style={{
+            display: 'flex',
+            gap: '16px',
+            paddingTop: '16px'
+          }}>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+              style={{
+                flex: 1,
+                padding: '16px 24px',
+                border: '2px solid #e5e7eb',
+                background: 'rgba(255, 255, 255, 0.8)',
+                color: '#374151',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = '#9ca3af'
+                e.target.style.background = 'rgba(249, 250, 251, 1)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = '#e5e7eb'
+                e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`flex-1 px-6 py-3 rounded-xl font-medium text-white transition-all disabled:opacity-50 ${
-                formData.type === 'income'
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-red-600 hover:bg-red-700'
-              }`}
+              style={{
+                flex: 1,
+                padding: '16px 24px',
+                border: 'none',
+                background: loading 
+                  ? '#9ca3af'
+                  : formData.type === 'income'
+                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                    : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: 'white',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: loading ? 'none' : '0 8px 24px rgba(102, 126, 234, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.target.style.transform = 'translateY(-2px)'
+                  e.target.style.boxShadow = '0 12px 32px rgba(102, 126, 234, 0.4)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.target.style.transform = 'translateY(0)'
+                  e.target.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.3)'
+                }
+              }}
             >
               {loading ? 'Adding...' : `Add ${formData.type === 'income' ? 'Income' : 'Expense'}`}
             </button>

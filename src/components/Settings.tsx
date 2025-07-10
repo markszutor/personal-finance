@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useUserPreferences, useCreateUserPreferences, useUpdateUserPreferences } from '../hooks/useUserPreferences'
-import { Settings as SettingsIcon, Globe, Save, Check } from 'lucide-react'
+import { Settings as SettingsIcon, Globe, Save, Check, Sparkles } from 'lucide-react'
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', symbol: '$' },
@@ -53,51 +53,146 @@ export function Settings() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200"></div>
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent absolute top-0"></div>
-        </div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '400px'
+      }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          border: '4px solid #e5e7eb',
+          borderTop: '4px solid #667eea',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     )
   }
 
   return (
-    <div className="space-y-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+        <h1 style={{
+          fontSize: '36px',
+          fontWeight: '700',
+          margin: '0 0 8px 0',
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
           Settings
         </h1>
-        <p className="mt-2 text-gray-600 flex items-center">
-          <SettingsIcon className="h-4 w-4 mr-2 text-blue-500" />
+        <p style={{
+          margin: 0,
+          color: '#6b7280',
+          fontSize: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <SettingsIcon size={16} color="#667eea" />
           Customize your financial tracking preferences
         </p>
       </div>
 
-      <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-xl">
-        <div className="flex items-center mb-6">
-          <div className="p-2 bg-blue-100 rounded-lg mr-3">
-            <Globe className="h-5 w-5 text-blue-600" />
+      {/* Currency Settings Card */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '32px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '24px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            padding: '12px',
+            borderRadius: '12px'
+          }}>
+            <Globe size={20} color="white" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Currency Settings</h3>
-            <p className="text-sm text-gray-600">Set your default currency for transactions and reporting</p>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              Currency Settings
+            </h3>
+            <p style={{
+              margin: 0,
+              fontSize: '14px',
+              color: '#6b7280'
+            }}>
+              Set your default currency for transactions and reporting
+            </p>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <label className="block text-sm font-semibold text-gray-700">
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '16px'
+          }}>
             Default Currency
           </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px'
+          }}>
             {CURRENCIES.map((currency) => (
               <label
                 key={currency.code}
-                className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                  defaultCurrency === currency.code
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '20px',
+                  borderRadius: '16px',
+                  border: '2px solid',
+                  borderColor: defaultCurrency === currency.code ? '#667eea' : 'rgba(0, 0, 0, 0.1)',
+                  background: defaultCurrency === currency.code 
+                    ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)'
+                    : 'rgba(255, 255, 255, 0.6)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: defaultCurrency === currency.code 
+                    ? '0 8px 32px rgba(102, 126, 234, 0.2)' 
+                    : '0 4px 16px rgba(0, 0, 0, 0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  if (defaultCurrency !== currency.code) {
+                    e.currentTarget.style.borderColor = '#667eea'
+                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.05)'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (defaultCurrency !== currency.code) {
+                    e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)'
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }
+                }}
               >
                 <input
                   type="radio"
@@ -105,18 +200,56 @@ export function Settings() {
                   value={currency.code}
                   checked={defaultCurrency === currency.code}
                   onChange={(e) => setDefaultCurrency(e.target.value)}
-                  className="sr-only"
+                  style={{ display: 'none' }}
                 />
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">{currency.symbol}</span>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      marginRight: '12px',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      padding: '8px',
+                      borderRadius: '8px',
+                      color: 'white',
+                      minWidth: '40px',
+                      textAlign: 'center'
+                    }}>
+                      {currency.symbol}
+                    </div>
                     <div>
-                      <p className="font-semibold">{currency.code}</p>
-                      <p className="text-sm text-gray-500">{currency.name}</p>
+                      <p style={{
+                        margin: 0,
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#1a1a1a'
+                      }}>
+                        {currency.code}
+                      </p>
+                      <p style={{
+                        margin: 0,
+                        fontSize: '14px',
+                        color: '#6b7280'
+                      }}>
+                        {currency.name}
+                      </p>
                     </div>
                   </div>
                   {defaultCurrency === currency.code && (
-                    <Check className="h-5 w-5 text-blue-600" />
+                    <div style={{
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      padding: '6px',
+                      borderRadius: '50%'
+                    }}>
+                      <Check size={16} color="white" />
+                    </div>
                   )}
                 </div>
               </label>
@@ -124,49 +257,163 @@ export function Settings() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">
-                All transactions will be converted to your default currency for reporting and analytics.
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Exchange rates are updated automatically when adding transactions.
-              </p>
-            </div>
-            <button
-              onClick={handleSave}
-              disabled={saving || saved}
-              className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all ${
-                saved
-                  ? 'bg-green-600 text-white'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
-              }`}
-            >
-              {saved ? (
-                <>
-                  <Check className="h-4 w-4 mr-2" />
-                  Saved!
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </>
-              )}
-            </button>
+        <div style={{
+          paddingTop: '24px',
+          borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div>
+            <p style={{
+              margin: '0 0 4px 0',
+              fontSize: '14px',
+              color: '#6b7280'
+            }}>
+              All transactions will be converted to your default currency for reporting and analytics.
+            </p>
+            <p style={{
+              margin: 0,
+              fontSize: '12px',
+              color: '#9ca3af'
+            }}>
+              Exchange rates are updated automatically when adding transactions.
+            </p>
           </div>
+          <button
+            onClick={handleSave}
+            disabled={saving || saved}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '16px 24px',
+              borderRadius: '12px',
+              border: 'none',
+              background: saved 
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: saving || saved ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              opacity: saving ? 0.7 : 1,
+              boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              if (!saving && !saved) {
+                e.target.style.transform = 'translateY(-2px)'
+                e.target.style.boxShadow = '0 12px 32px rgba(102, 126, 234, 0.4)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!saving && !saved) {
+                e.target.style.transform = 'translateY(0)'
+                e.target.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.3)'
+              }
+            }}
+          >
+            {saved ? (
+              <>
+                <Check size={16} />
+                <span>Saved!</span>
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
-      <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-xl">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Supported Currencies</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Supported Currencies Info Card */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '32px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '24px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+            padding: '12px',
+            borderRadius: '12px'
+          }}>
+            <Sparkles size={20} color="white" />
+          </div>
+          <h3 style={{
+            margin: 0,
+            fontSize: '20px',
+            fontWeight: '700',
+            color: '#1a1a1a'
+          }}>
+            Supported Currencies
+          </h3>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '16px'
+        }}>
           {CURRENCIES.map((currency) => (
-            <div key={currency.code} className="text-center p-4 bg-gray-50 rounded-xl">
-              <div className="text-2xl mb-2">{currency.symbol}</div>
-              <div className="font-semibold text-gray-900">{currency.code}</div>
-              <div className="text-xs text-gray-500">{currency.name}</div>
+            <div key={currency.code} style={{
+              textAlign: 'center',
+              padding: '20px',
+              background: 'rgba(255, 255, 255, 0.6)',
+              borderRadius: '16px',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)'
+              e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+            >
+              <div style={{
+                fontSize: '24px',
+                marginBottom: '8px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 12px auto'
+              }}>
+                {currency.symbol}
+              </div>
+              <div style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1a1a1a',
+                marginBottom: '4px'
+              }}>
+                {currency.code}
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: '#6b7280'
+              }}>
+                {currency.name}
+              </div>
             </div>
           ))}
         </div>
