@@ -28,6 +28,7 @@ export type Database = {
           amount: number
           category: string
           type: 'income' | 'expense'
+          transaction_date: string
           created_at: string
           updated_at: string
           currency: string
@@ -41,6 +42,7 @@ export type Database = {
           amount: number
           category: string
           type: 'income' | 'expense'
+          transaction_date?: string
           created_at?: string
           updated_at?: string
           currency?: string
@@ -54,10 +56,58 @@ export type Database = {
           amount?: number
           category?: string
           type?: 'income' | 'expense'
+          transaction_date?: string
           created_at?: string
           updated_at?: string
           currency?: string
           exchange_rate?: number | null
+        }
+      }
+      investments: {
+        Row: {
+          id: string
+          user_id: string
+          symbol: string
+          name: string
+          type: 'stock' | 'bond' | 'crypto' | 'etf' | 'mutual_fund' | 'real_estate' | 'commodity' | 'other'
+          quantity: number
+          purchase_price: number
+          current_price: number
+          currency: string
+          exchange_rate: number | null
+          purchase_date: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          symbol: string
+          name: string
+          type: 'stock' | 'bond' | 'crypto' | 'etf' | 'mutual_fund' | 'real_estate' | 'commodity' | 'other'
+          quantity: number
+          purchase_price: number
+          current_price: number
+          currency?: string
+          exchange_rate?: number | null
+          purchase_date?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          symbol?: string
+          name?: string
+          type?: 'stock' | 'bond' | 'crypto' | 'etf' | 'mutual_fund' | 'real_estate' | 'commodity' | 'other'
+          quantity?: number
+          purchase_price?: number
+          current_price?: number
+          currency?: string
+          exchange_rate?: number | null
+          purchase_date?: string
+          created_at?: string
+          updated_at?: string
         }
       }
       user_preferences: {

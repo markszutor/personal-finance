@@ -47,7 +47,8 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
     amount: '',
     category: '',
     type: 'expense' as 'income' | 'expense',
-    currency: defaultCurrency
+    currency: defaultCurrency,
+    transaction_date: new Date().toISOString().split('T')[0]
   })
 
   const [loading, setLoading] = useState(false)
@@ -72,7 +73,8 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
         category: formData.category,
         type: formData.type,
         currency: formData.currency,
-        exchange_rate: exchangeRate
+        exchange_rate: exchangeRate,
+        transaction_date: formData.transaction_date
       })
       onClose()
     } catch (error) {
@@ -528,6 +530,44 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Transaction Date */}
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Transaction Date *
+            </label>
+            <input
+              type="date"
+              required
+              style={{
+                width: 'calc(100% - 32px)',
+                boxSizing: 'border-box',
+                padding: '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '12px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'all 0.2s ease',
+                backgroundColor: '#fafafa'
+              }}
+              value={formData.transaction_date}
+              onChange={(e) => setFormData({ ...formData, transaction_date: e.target.value })}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#667eea'
+                e.target.style.backgroundColor = '#ffffff'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e5e7eb'
+                e.target.style.backgroundColor = '#fafafa'
+              }}
+            />
           </div>
 
           {/* Currency Conversion Notice */}

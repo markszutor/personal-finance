@@ -9,7 +9,8 @@ import {
   PlusCircle,
   Wallet,
   Menu,
-  X
+  X,
+  Plus
 } from 'lucide-react'
 
 interface LayoutProps {
@@ -250,36 +251,73 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
       </div>
 
       {/* Floating Action Button */}
-      <button
-        onClick={() => onPageChange('add-transaction')}
+      <div
         style={{
           position: 'fixed',
           bottom: '32px',
           right: '32px',
-          width: '64px',
-          height: '64px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          border: 'none',
-          borderRadius: '20px',
-          boxShadow: '0 12px 40px rgba(102, 126, 234, 0.4)',
-          cursor: 'pointer',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.3s ease',
+          flexDirection: 'column',
+          gap: '12px',
           zIndex: 30
         }}
-        onMouseEnter={(e) => {
-          e.target.style.transform = 'scale(1.1) rotate(90deg)'
-          e.target.style.boxShadow = '0 16px 50px rgba(102, 126, 234, 0.6)'
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = 'scale(1) rotate(0deg)'
-          e.target.style.boxShadow = '0 12px 40px rgba(102, 126, 234, 0.4)'
-        }}
       >
-        <PlusCircle size={28} color="white" />
-      </button>
+        {/* Add Investment Button */}
+        <button
+          onClick={() => onPageChange('add-investment')}
+          style={{
+            width: '56px',
+            height: '56px',
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            border: 'none',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(16, 185, 129, 0.4)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'scale(1.1)'
+            e.target.style.boxShadow = '0 12px 40px rgba(16, 185, 129, 0.6)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'scale(1)'
+            e.target.style.boxShadow = '0 8px 32px rgba(16, 185, 129, 0.4)'
+          }}
+        >
+          <TrendingUp size={24} color="white" />
+        </button>
+        
+        {/* Add Transaction Button */}
+        <button
+          onClick={() => onPageChange('add-transaction')}
+          style={{
+            width: '64px',
+            height: '64px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: 'none',
+            borderRadius: '20px',
+            boxShadow: '0 12px 40px rgba(102, 126, 234, 0.4)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'scale(1.1) rotate(90deg)'
+            e.target.style.boxShadow = '0 16px 50px rgba(102, 126, 234, 0.6)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'scale(1) rotate(0deg)'
+            e.target.style.boxShadow = '0 12px 40px rgba(102, 126, 234, 0.4)'
+          }}
+        >
+          <PlusCircle size={28} color="white" />
+        </button>
+      </div>
     </div>
   )
 }

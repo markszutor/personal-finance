@@ -1,7 +1,9 @@
 import React from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useTransactions } from '../hooks/useTransactions'
+import { useInvestments } from '../hooks/useInvestments'
 import { useUserPreferences } from '../hooks/useUserPreferences'
+import { DateFilter } from './DateFilter'
 import { formatCurrency, convertCurrency } from '../lib/utils'
 import { 
   TrendingUp, 
@@ -15,16 +17,19 @@ import {
   PieChart as PieChartIcon,
   BarChart3,
   Calendar,
-  Eye
+  Eye,
+  Filter
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 export function Dashboard() {
   const { user } = useAuth()
-  const { data: transactions = [], isLoading } = useTransactions(user?.id)
+  const [dateRange, setDateRange] = React.useState<{ from?: string; to?: string }>({})
+  const { data: transactions = [], isLoading: transactionsLoading } = useTransactions(user?.id, dateRange)
+  const { data: investments = [], isLoading: investmentsLoading } = useInvestments(user?.id, dateRange)
   const { data: preferences } = useUserPreferences(user?.id)
 
-  if (isLoading) {
+  if (transactionsLoading || investmentsLoading) {
     return (
       <div style={{
         display: 'flex',
@@ -66,7 +71,32 @@ export function Dashboard() {
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.convertedAmount, 0)
 
-  const netWorth = totalIncome - totalExpenses
+  // Calculate investment values
+  const convertedInvestments = investments.map(inv => ({
+    ...inv,
+    convertedCurrentValue: convertCurrency(
+      inv.quantity * inv.current_price, 
+      inv.currency, 
+      defaultCurrency, 
+      inv.exchange_rate
+    ),
+    convertedCostBasis: convertCurrency(
+      inv.quantity * inv.purchase_price, 
+      inv.currency, 
+      defaultCurrency, 
+      inv.exchange_rate
+    )
+  }))
+
+  const totalInvestmentValue = convertedInvestments
+    .reduce((sum, inv) => sum + inv.convertedCurrentValue, 0)
+
+  const totalInvestmentCost = convertedInvestments
+    .reduce((sum, inv) => sum + inv.convertedCostBasis, 0)
+
+  const investmentGainLoss = totalInvestmentValue - totalInvestmentCost
+
+  const netWorth = totalIncome - totalExpenses + totalInvestmentValue
 
   // Get recent transactions
   const recentTransactions = convertedTransactions.slice(0, 5)
@@ -203,32 +233,42 @@ export function Dashboard() {
           </p>
         </div>
         <div style={{
-          background: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(20px)',
-          padding: '16px 24px',
-          borderRadius: '16px',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          textAlign: 'center'
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
         }}>
-          <p style={{
-            margin: '0 0 4px 0',
-            fontSize: '12px',
-            color: '#6b7280',
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
+          <DateFilter 
+            onDateRangeChange={setDateRange}
+            currentRange={dateRange}
+          />
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(20px)',
+            padding: '16px 24px',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            textAlign: 'center'
           }}>
-            Default Currency
-          </p>
-          <p style={{
-            margin: 0,
-            fontSize: '18px',
-            fontWeight: '700',
-            color: '#1a1a1a'
-          }}>
-            {defaultCurrency}
-          </p>
+            <p style={{
+              margin: '0 0 4px 0',
+              fontSize: '12px',
+              color: '#6b7280',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Default Currency
+            </p>
+            <p style={{
+              margin: 0,
+              fontSize: '18px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              {defaultCurrency}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -255,20 +295,20 @@ export function Dashboard() {
           bgColor="rgba(239, 68, 68, 0.2)"
         />
         <StatCard
-          title="Net Worth"
-          value={formatCurrency(netWorth, defaultCurrency)}
+          title="Investment Value"
+          value={formatCurrency(totalInvestmentValue, defaultCurrency)}
           icon={Target}
-          gradient={netWorth >= 0 ? ['#667eea', '#764ba2'] : ['#f59e0b', '#d97706']}
-          textColor={netWorth >= 0 ? '#1e1b4b' : '#78350f'}
-          bgColor={netWorth >= 0 ? 'rgba(102, 126, 234, 0.2)' : 'rgba(245, 158, 11, 0.2)'}
-        />
-        <StatCard
-          title="Transactions"
-          value={transactions.length.toString()}
-          icon={CreditCard}
           gradient={['#8b5cf6', '#7c3aed']}
           textColor="#581c87"
           bgColor="rgba(139, 92, 246, 0.2)"
+        />
+        <StatCard
+          title="Net Worth"
+          value={formatCurrency(netWorth, defaultCurrency)}
+          icon={DollarSign}
+          gradient={netWorth >= 0 ? ['#667eea', '#764ba2'] : ['#f59e0b', '#d97706']}
+          textColor={netWorth >= 0 ? '#1e1b4b' : '#78350f'}
+          bgColor={netWorth >= 0 ? 'rgba(102, 126, 234, 0.2)' : 'rgba(245, 158, 11, 0.2)'}
         />
       </div>
 

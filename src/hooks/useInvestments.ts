@@ -2,45 +2,45 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Database } from '../lib/supabase'
 
-type Transaction = Database['public']['Tables']['transactions']['Row']
-type TransactionInsert = Database['public']['Tables']['transactions']['Insert']
-type TransactionUpdate = Database['public']['Tables']['transactions']['Update']
+type Investment = Database['public']['Tables']['investments']['Row']
+type InvestmentInsert = Database['public']['Tables']['investments']['Insert']
+type InvestmentUpdate = Database['public']['Tables']['investments']['Update']
 
-export function useTransactions(userId?: string, dateRange?: { from?: string; to?: string }) {
+export function useInvestments(userId?: string, dateRange?: { from?: string; to?: string }) {
   return useQuery({
-    queryKey: ['transactions', userId, dateRange],
+    queryKey: ['investments', userId, dateRange],
     queryFn: async () => {
       if (!userId) return []
       
       let query = supabase
-        .from('transactions')
+        .from('investments')
         .select('*')
         .eq('user_id', userId)
 
       if (dateRange?.from) {
-        query = query.gte('transaction_date', dateRange.from)
+        query = query.gte('purchase_date', dateRange.from)
       }
       if (dateRange?.to) {
-        query = query.lte('transaction_date', dateRange.to)
+        query = query.lte('purchase_date', dateRange.to)
       }
 
-      const { data, error } = await query.order('transaction_date', { ascending: false })
+      const { data, error } = await query.order('purchase_date', { ascending: false })
 
       if (error) throw error
-      return data as Transaction[]
+      return data as Investment[]
     },
     enabled: !!userId,
   })
 }
 
-export function useCreateTransaction() {
+export function useCreateInvestment() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (transaction: TransactionInsert) => {
+    mutationFn: async (investment: InvestmentInsert) => {
       const { data, error } = await supabase
-        .from('transactions')
-        .insert(transaction)
+        .from('investments')
+        .insert(investment)
         .select()
         .single()
 
@@ -48,18 +48,18 @@ export function useCreateTransaction() {
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['investments'] })
     },
   })
 }
 
-export function useUpdateTransaction() {
+export function useUpdateInvestment() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, ...updates }: TransactionUpdate & { id: string }) => {
+    mutationFn: async ({ id, ...updates }: InvestmentUpdate & { id: string }) => {
       const { data, error } = await supabase
-        .from('transactions')
+        .from('investments')
         .update(updates)
         .eq('id', id)
         .select()
@@ -69,25 +69,25 @@ export function useUpdateTransaction() {
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['investments'] })
     },
   })
 }
 
-export function useDeleteTransaction() {
+export function useDeleteInvestment() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('transactions')
+        .from('investments')
         .delete()
         .eq('id', id)
 
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['investments'] })
     },
   })
 }

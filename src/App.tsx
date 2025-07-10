@@ -5,6 +5,7 @@ import { Auth } from './components/Auth'
 import { Layout } from './components/Layout'
 import { Dashboard } from './components/Dashboard'
 import { TransactionForm } from './components/TransactionForm'
+import { InvestmentForm } from './components/InvestmentForm'
 import { Settings } from './components/Settings'
 import { CreditCard, TrendingUp } from 'lucide-react'
 
@@ -14,10 +15,13 @@ function AppContent() {
   const { user, loading } = useAuth()
   const [currentPage, setCurrentPage] = useState('dashboard')
   const [showTransactionForm, setShowTransactionForm] = useState(false)
+  const [showInvestmentForm, setShowInvestmentForm] = useState(false)
 
   const handlePageChange = (page: string) => {
     if (page === 'add-transaction') {
       setShowTransactionForm(true)
+    } else if (page === 'add-investment') {
+      setShowInvestmentForm(true)
     } else {
       setCurrentPage(page)
     }
@@ -177,6 +181,9 @@ function AppContent() {
       {renderPage()}
       {showTransactionForm && (
         <TransactionForm onClose={() => setShowTransactionForm(false)} />
+      )}
+      {showInvestmentForm && (
+        <InvestmentForm onClose={() => setShowInvestmentForm(false)} />
       )}
     </Layout>
   )
