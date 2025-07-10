@@ -7,21 +7,29 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
+    // Temporarily disabled for development - create mock user
+    const mockUser = {
+      id: 'dev-user-123',
+      email: 'dev@example.com',
+    } as User
+    
+    setUser(mockUser)
+    setLoading(false)
+    
+    // Original auth code commented out for development
+    // supabase.auth.getSession().then(({ data: { session } }) => {
+    //   setUser(session?.user ?? null)
+    //   setLoading(false)
+    // })
+    //
+    // const {
+    //   data: { subscription },
+    // } = supabase.auth.onAuthStateChange((_event, session) => {
+    //   setUser(session?.user ?? null)
+    //   setLoading(false)
+    // })
+    //
+    // return () => subscription.unsubscribe()
   }, [])
 
   const signIn = async (email: string, password: string) => {

@@ -29,9 +29,10 @@ function AppContent() {
     )
   }
 
-  if (!user) {
-    return <Auth />
-  }
+  // Temporarily disabled for development
+  // if (!user) {
+  //   return <Auth />
+  // }
 
   const renderPage = () => {
     switch (currentPage) {
