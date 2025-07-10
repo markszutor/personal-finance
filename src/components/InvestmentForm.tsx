@@ -10,13 +10,9 @@ interface InvestmentFormProps {
 }
 
 const INVESTMENT_TYPES = [
-  { value: 'stock', label: 'Stock', icon: '📈' },
-  { value: 'bond', label: 'Bond', icon: '🏛️' },
+  { value: 'stocks', label: 'Stocks', icon: '📈' },
   { value: 'crypto', label: 'Cryptocurrency', icon: '₿' },
-  { value: 'etf', label: 'ETF', icon: '📊' },
-  { value: 'mutual_fund', label: 'Mutual Fund', icon: '🏦' },
-  { value: 'real_estate', label: 'Real Estate', icon: '🏠' },
-  { value: 'commodity', label: 'Commodity', icon: '🥇' },
+  { value: 'p2p_lending', label: 'P2P Lending', icon: '🏦' },
   { value: 'other', label: 'Other', icon: '💼' }
 ]
 
@@ -32,7 +28,7 @@ export function InvestmentForm({ onClose }: InvestmentFormProps) {
   const [formData, setFormData] = useState({
     symbol: '',
     name: '',
-    type: 'stock' as any,
+    type: 'stocks' as any,
     quantity: '',
     purchase_price: '',
     current_price: '',

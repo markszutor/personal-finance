@@ -6,8 +6,11 @@ import { Layout } from './components/Layout'
 import { Dashboard } from './components/Dashboard'
 import { TransactionForm } from './components/TransactionForm'
 import { InvestmentForm } from './components/InvestmentForm'
-import { TransactionsList } from './components/TransactionsList'
-import { InvestmentsList } from './components/InvestmentsList'
+import { IncomeList } from './components/IncomeList'
+import { ExpensesList } from './components/ExpensesList'
+import { StocksList } from './components/StocksList'
+import { CryptoList } from './components/CryptoList'
+import { P2PLendingList } from './components/P2PLendingList'
 import { Settings } from './components/Settings'
 import { CreditCard, TrendingUp } from 'lucide-react'
 
@@ -45,10 +48,16 @@ function AppContent() {
     switch (currentPage) {
       case 'dashboard':
         return <Dashboard />
-      case 'transactions':
-        return <TransactionsList />
-      case 'investments':
-        return <InvestmentsList />
+      case 'income':
+        return <IncomeList />
+      case 'expenses':
+        return <ExpensesList />
+      case 'stocks':
+        return <StocksList />
+      case 'crypto':
+        return <CryptoList />
+      case 'p2p_lending':
+        return <P2PLendingList />
       case 'settings':
         return <Settings />
       default:
