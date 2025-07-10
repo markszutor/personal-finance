@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/transaction.dart';
+import '../models/currency.dart';
 
 class TransactionCard extends StatelessWidget {
   final Transaction transaction;
@@ -75,6 +76,7 @@ class TransactionCard extends StatelessWidget {
     final isIncome = transaction.type == TransactionType.income;
     final amountColor = isIncome ? Colors.green : Colors.red;
     final categoryColor = _getCategoryColor(transaction.category, context);
+    final currency = CurrencyData.getCurrency(transaction.currency);
 
     return Card(
       child: ListTile(
@@ -111,12 +113,26 @@ class TransactionCard extends StatelessWidget {
             ),
           ],
         ),
-        trailing: Text(
-          '${isIncome ? '+' : '-'}\$${transaction.amount.toStringAsFixed(2)}',
-          style: TextStyle(
-            color: amountColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              '${isIncome ? '+' : '-'}${currency.symbol}${transaction.amount.toStringAsFixed(currency.decimalPlaces)}',
+              style: TextStyle(
+                color: amountColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            if (transaction.currency != 'USD') // Show currency code if not USD
+              Text(
+                transaction.currency,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+          ],
           ),
         ),
         isThreeLine: transaction.description != null,

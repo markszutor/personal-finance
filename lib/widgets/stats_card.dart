@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class StatsCard extends StatelessWidget {
   final Map<String, double> stats;
+  final String currencySymbol;
 
   const StatsCard({
     super.key,
     required this.stats,
+    this.currencySymbol = '\$',
   });
 
   @override
@@ -39,7 +41,7 @@ class StatsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '\$${balance.toStringAsFixed(2)}',
+                    '$currencySymbol${balance.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: balance >= 0 ? Colors.green : Colors.red,
@@ -82,7 +84,7 @@ class StatsCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '\$${income.toStringAsFixed(2)}',
+                          '$currencySymbol${income.toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -121,7 +123,7 @@ class StatsCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '\$${expense.toStringAsFixed(2)}',
+                          '$currencySymbol${expense.toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

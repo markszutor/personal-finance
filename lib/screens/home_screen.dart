@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/supabase_service.dart';
 import '../models/transaction.dart';
+import '../models/user_preferences.dart';
+import '../models/currency.dart';
 import '../widgets/transaction_card.dart';
 import '../widgets/stats_card.dart';
 import 'add_transaction_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Transaction> _transactions = [];
   Map<String, double> _stats = {};
+  UserPreferences? _userPreferences;
   bool _isLoading = true;
 
   @override
@@ -28,12 +32,21 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _isLoading = true);
     
     try {
+      // Load user preferences first
+      UserPreferences? preferences;
+      try {
+        preferences = await SupabaseService.getUserPreferences();
+      } catch (e) {
+        // Preferences might not exist yet
+      }
+      
       final transactions = await SupabaseService.getTransactions();
-      final stats = await SupabaseService.getMonthlyStats();
+      final stats = await SupabaseService.getMonthlyStats(preferences?.defaultCurrency);
       
       setState(() {
         _transactions = transactions;
         _stats = stats;
+        _userPreferences = preferences;
         _isLoading = false;
       });
     } catch (error) {
@@ -49,33 +62,29 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _signOut() async {
-    try {
-      await SupabaseService.signOut();
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/auth');
-      }
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error signing out: $error'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final defaultCurrency = _userPreferences?.defaultCurrency ?? 'USD';
+    final currencySymbol = CurrencyData.getCurrency(defaultCurrency).symbol;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Personal Finance'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _signOut,
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              final result = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+              
+              if (result == true) {
+                _loadData();
+              }
+            },
           ),
         ],
       ),
@@ -98,7 +107,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          StatsCard(stats: _stats),
+                          StatsCard(
+                            stats: _stats,
+                            currencySymbol: currencySymbol,
+                          ),
                           const SizedBox(height: 24),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

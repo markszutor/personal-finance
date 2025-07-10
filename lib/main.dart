@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/settings_screen.dart';
 import 'utils/theme.dart';
 
 void main() async {
@@ -33,6 +34,7 @@ class PersonalFinanceApp extends StatelessWidget {
       routes: {
         '/auth': (context) => const AuthScreen(),
         '/home': (context) => const HomeScreen(),
+        '/settings': (context) => const SettingsScreen(),
       },
     );
   }
