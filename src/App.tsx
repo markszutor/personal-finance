@@ -12,7 +12,6 @@ import { StocksList } from './components/StocksList'
 import { CryptoList } from './components/CryptoList'
 import { P2PLendingList } from './components/P2PLendingList'
 import { Settings } from './components/Settings'
-import { ElectricityList } from './components/ElectricityList'
 import { CreditCard, TrendingUp } from 'lucide-react'
 
 const queryClient = new QueryClient()

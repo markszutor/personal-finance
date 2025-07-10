@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { useTransactions, useDeleteTransaction } from '../hooks/useTransactions'
+import { useElectricityBills, useElectricityBillForecast, useDeleteElectricityBill } from '../hooks/useElectricityBills'
 import { useUserPreferences } from '../hooks/useUserPreferences'
+import { ElectricityBillForm } from './ElectricityBillForm'
 import { DateFilter } from './DateFilter'
 import { formatCurrency, convertCurrency } from '../lib/utils'
 import { 
@@ -10,9 +11,14 @@ import {
   Trash2, 
   Search,
   AlertTriangle,
-  TrendingDown,
+  TrendingUp,
   Calendar,
-  DollarSign
+  DollarSign,
+  Plus,
+  Activity,
+  Target,
+  BarChart3,
+  Lightbulb
 } from 'lucide-react'
 
 export function ElectricityList() {
@@ -20,54 +26,51 @@ export function ElectricityList() {
   const [dateRange, setDateRange] = useState<{ from?: string; to?: string }>({})
   const [searchTerm, setSearchTerm] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
+  const [showBillForm, setShowBillForm] = useState(false)
   
-  const { data: allTransactions = [], isLoading } = useTransactions(user?.id, dateRange)
+  const { data: bills = [], isLoading } = useElectricityBills(user?.id, dateRange)
+  const { data: forecast } = useElectricityBillForecast(user?.id)
   const { data: preferences } = useUserPreferences(user?.id)
-  const deleteTransaction = useDeleteTransaction()
+  const deleteBill = useDeleteElectricityBill()
 
   const defaultCurrency = preferences?.default_currency || 'USD'
 
-  // Filter only electricity-related transactions
-  const electricityTransactions = allTransactions.filter(t => 
-    t.category.toLowerCase().includes('electricity') || 
-    t.category.toLowerCase().includes('electric') ||
-    t.category.toLowerCase().includes('power') ||
-    t.category.toLowerCase().includes('utility') ||
-    t.title.toLowerCase().includes('electricity') ||
-    t.title.toLowerCase().includes('electric') ||
-    t.title.toLowerCase().includes('power')
-  )
-
-  // Filter transactions based on search
-  const filteredTransactions = electricityTransactions.filter(transaction => {
-    const matchesSearch = transaction.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.category.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter bills based on search
+  const filteredBills = bills.filter(bill => {
+    const matchesSearch = bill.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         bill.bill_date.includes(searchTerm) ||
+                         bill.reading_date.includes(searchTerm)
     
     return matchesSearch
   })
 
-  // Calculate total electricity costs
-  const totalElectricityCosts = filteredTransactions.reduce((sum, t) => {
-    const convertedAmount = convertCurrency(t.amount, t.currency, defaultCurrency, t.exchange_rate)
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteBill.mutateAsync(id)
+      setShowDeleteConfirm(null)
+    } catch (error) {
+      console.error('Error deleting bill:', error)
+    }
+  }
+
+  // Calculate totals
+  const totalCosts = filteredBills.reduce((sum, bill) => {
+    const convertedAmount = convertCurrency(
+      bill.amount_paid,
+      bill.currency,
+      defaultCurrency,
+      bill.exchange_rate
+    )
     return sum + convertedAmount
   }, 0)
 
-  // Calculate monthly average
-  const monthlyAverage = filteredTransactions.length > 0 
-    ? totalElectricityCosts / Math.max(1, new Set(filteredTransactions.map(t => 
-        new Date(t.transaction_date || t.created_at).toISOString().slice(0, 7)
+  const totalUsage = filteredBills.reduce((sum, bill) => sum + (bill.total_usage || 0), 0)
+
+  const monthlyAverage = filteredBills.length > 0 
+    ? totalCosts / Math.max(1, new Set(filteredBills.map(b => 
+        new Date(b.bill_date).toISOString().slice(0, 7)
       )).size)
     : 0
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteTransaction.mutateAsync(id)
-      setShowDeleteConfirm(null)
-    } catch (error) {
-      console.error('Error deleting transaction:', error)
-    }
-  }
 
   if (isLoading) {
     return (
@@ -125,16 +128,51 @@ export function ElectricityList() {
             gap: '8px'
           }}>
             <Zap size={16} color="#f59e0b" />
-            Track your electricity and power expenses
+            Track your electricity usage and bills with smart forecasting
           </p>
         </div>
-        <DateFilter 
-          onDateRangeChange={setDateRange}
-          currentRange={dateRange}
-        />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
+        }}>
+          <DateFilter 
+            onDateRangeChange={setDateRange}
+            currentRange={dateRange}
+          />
+          <button
+            onClick={() => setShowBillForm(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 20px',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)'
+              e.target.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)'
+            }}
+          >
+            <Plus size={16} />
+            Add Bill
+          </button>
+        </div>
       </div>
 
-      {/* Electricity Summary */}
+      {/* Summary Cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -158,9 +196,17 @@ export function ElectricityList() {
             borderRadius: '50%'
           }} />
           <div style={{ position: 'relative', zIndex: 2 }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '14px', opacity: 0.9 }}>Total Electricity Costs</p>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '8px'
+            }}>
+              <DollarSign size={16} />
+              <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Total Costs</p>
+            </div>
             <p style={{ margin: 0, fontSize: '24px', fontWeight: '700' }}>
-              {formatCurrency(totalElectricityCosts, defaultCurrency)}
+              {formatCurrency(totalCosts, defaultCurrency)}
             </p>
           </div>
         </div>
@@ -183,7 +229,15 @@ export function ElectricityList() {
             borderRadius: '50%'
           }} />
           <div style={{ position: 'relative', zIndex: 2 }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '14px', opacity: 0.9 }}>Monthly Average</p>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '8px'
+            }}>
+              <BarChart3 size={16} />
+              <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Monthly Average</p>
+            </div>
             <p style={{ margin: 0, fontSize: '24px', fontWeight: '700' }}>
               {formatCurrency(monthlyAverage, defaultCurrency)}
             </p>
@@ -208,13 +262,202 @@ export function ElectricityList() {
             borderRadius: '50%'
           }} />
           <div style={{ position: 'relative', zIndex: 2 }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '14px', opacity: 0.9 }}>Total Bills</p>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '8px'
+            }}>
+              <Activity size={16} />
+              <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Total Usage</p>
+            </div>
             <p style={{ margin: 0, fontSize: '24px', fontWeight: '700' }}>
-              {filteredTransactions.length}
+              {totalUsage.toFixed(1)} kWh
             </p>
           </div>
         </div>
+
+        {forecast && (
+          <div style={{
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            borderRadius: '24px',
+            padding: '24px',
+            color: 'white',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '-20px',
+              right: '-20px',
+              width: '80px',
+              height: '80px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '50%'
+            }} />
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '8px'
+              }}>
+                <Target size={16} />
+                <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>Next Bill Forecast</p>
+              </div>
+              <p style={{ margin: 0, fontSize: '24px', fontWeight: '700' }}>
+                {formatCurrency(forecast.forecasted_amount, defaultCurrency)}
+              </p>
+              <p style={{ margin: '4px 0 0 0', fontSize: '12px', opacity: 0.8 }}>
+                {forecast.confidence_level} confidence • {forecast.based_on_bills} bills
+              </p>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Forecast Details */}
+      {forecast && (
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          padding: '32px',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '24px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              padding: '12px',
+              borderRadius: '12px'
+            }}>
+              <Lightbulb size={20} color="white" />
+            </div>
+            <div>
+              <h3 style={{
+                margin: 0,
+                fontSize: '20px',
+                fontWeight: '700',
+                color: '#1a1a1a'
+              }}>
+                Smart Forecast
+              </h3>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                AI-powered prediction based on your historical usage patterns
+              </p>
+            </div>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '24px'
+          }}>
+            <div style={{
+              padding: '20px',
+              background: 'rgba(16, 185, 129, 0.1)',
+              borderRadius: '16px',
+              border: '1px solid rgba(16, 185, 129, 0.2)'
+            }}>
+              <h4 style={{
+                margin: '0 0 8px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#065f46'
+              }}>
+                Forecasted Amount
+              </h4>
+              <p style={{
+                margin: '0 0 4px 0',
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#10b981'
+              }}>
+                {formatCurrency(forecast.forecasted_amount, defaultCurrency)}
+              </p>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                Expected next bill amount
+              </p>
+            </div>
+
+            <div style={{
+              padding: '20px',
+              background: 'rgba(245, 158, 11, 0.1)',
+              borderRadius: '16px',
+              border: '1px solid rgba(245, 158, 11, 0.2)'
+            }}>
+              <h4 style={{
+                margin: '0 0 8px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#92400e'
+              }}>
+                Forecasted Usage
+              </h4>
+              <p style={{
+                margin: '0 0 4px 0',
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#f59e0b'
+              }}>
+                {forecast.forecasted_usage} kWh
+              </p>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                Expected electricity usage
+              </p>
+            </div>
+
+            <div style={{
+              padding: '20px',
+              background: 'rgba(139, 92, 246, 0.1)',
+              borderRadius: '16px',
+              border: '1px solid rgba(139, 92, 246, 0.2)'
+            }}>
+              <h4 style={{
+                margin: '0 0 8px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#581c87'
+              }}>
+                Confidence Level
+              </h4>
+              <p style={{
+                margin: '0 0 4px 0',
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#8b5cf6'
+              }}>
+                {forecast.confidence_level}
+              </p>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                Based on {forecast.based_on_bills} historical bills
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search Filter */}
       <div style={{
@@ -238,7 +481,7 @@ export function ElectricityList() {
           />
           <input
             type="text"
-            placeholder="Search electricity bills..."
+            placeholder="Search bills..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -293,7 +536,7 @@ export function ElectricityList() {
         )}
       </div>
 
-      {/* Electricity Bills List */}
+      {/* Bills List */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(20px)',
@@ -324,11 +567,11 @@ export function ElectricityList() {
             fontSize: '14px',
             fontWeight: '600'
           }}>
-            {filteredTransactions.length} bills
+            {filteredBills.length} bills
           </div>
         </div>
 
-        {filteredTransactions.length === 0 ? (
+        {filteredBills.length === 0 ? (
           <div style={{
             textAlign: 'center',
             padding: '60px 20px'
@@ -354,15 +597,44 @@ export function ElectricityList() {
               No electricity bills found
             </h4>
             <p style={{
-              margin: 0,
+              margin: '0 0 24px 0',
               color: '#6b7280',
               fontSize: '16px'
             }}>
               {searchTerm 
                 ? 'Try adjusting your search terms'
-                : 'Add your first electricity bill to start tracking your power expenses!'
+                : 'Add your first electricity bill to start tracking your usage and get smart forecasts!'
               }
             </p>
+            <button
+              onClick={() => setShowBillForm(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)'
+                e.target.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)'
+                e.target.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)'
+              }}
+            >
+              <Plus size={16} />
+              Add Your First Bill
+            </button>
           </div>
         ) : (
           <div style={{
@@ -370,20 +642,20 @@ export function ElectricityList() {
             flexDirection: 'column',
             gap: '16px'
           }}>
-            {filteredTransactions.map((transaction) => {
+            {filteredBills.map((bill) => {
               const convertedAmount = convertCurrency(
-                transaction.amount, 
-                transaction.currency, 
+                bill.amount_paid, 
+                bill.currency, 
                 defaultCurrency, 
-                transaction.exchange_rate
+                bill.exchange_rate
               )
 
               return (
-                <div key={transaction.id} style={{
+                <div key={bill.id} style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '20px',
+                  padding: '24px',
                   background: 'rgba(255, 255, 255, 0.6)',
                   borderRadius: '16px',
                   border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -403,38 +675,77 @@ export function ElectricityList() {
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '16px',
+                    gap: '20px',
                     flex: 1
                   }}>
                     <div style={{
                       background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                      padding: '12px',
-                      borderRadius: '12px',
+                      padding: '16px',
+                      borderRadius: '16px',
                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                     }}>
-                      <Zap size={20} color="white" />
+                      <Zap size={24} color="white" />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <h4 style={{
-                        margin: '0 0 4px 0',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        color: '#1a1a1a'
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        marginBottom: '8px'
                       }}>
-                        {transaction.title}
-                      </h4>
+                        <h4 style={{
+                          margin: 0,
+                          fontSize: '18px',
+                          fontWeight: '700',
+                          color: '#1a1a1a'
+                        }}>
+                          Bill Date: {new Date(bill.bill_date).toLocaleDateString()}
+                        </h4>
+                        <span style={{
+                          background: '#f59e0b20',
+                          color: '#f59e0b',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: '500'
+                        }}>
+                          {bill.total_usage ? `${bill.total_usage.toFixed(1)} kWh` : 'No usage data'}
+                        </span>
+                      </div>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                        gap: '12px',
+                        fontSize: '14px',
+                        color: '#6b7280',
+                        marginBottom: '8px'
+                      }}>
+                        <div>
+                          <span style={{ fontWeight: '500' }}>Day:</span> {bill.day_reading} kWh
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: '500' }}>Night:</span> {bill.night_reading} kWh
+                        </div>
+                        {bill.day_usage && (
+                          <div>
+                            <span style={{ fontWeight: '500' }}>Day Usage:</span> {bill.day_usage.toFixed(1)} kWh
+                          </div>
+                        )}
+                        {bill.night_usage && (
+                          <div>
+                            <span style={{ fontWeight: '500' }}>Night Usage:</span> {bill.night_usage.toFixed(1)} kWh
+                          </div>
+                        )}
+                      </div>
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
                         fontSize: '14px',
-                        color: '#6b7280',
-                        flexWrap: 'wrap'
+                        color: '#9ca3af'
                       }}>
-                        <span>{transaction.category}</span>
-                        <span>•</span>
-                        <span>{new Date(transaction.transaction_date || transaction.created_at).toLocaleDateString()}</span>
-                        {transaction.currency !== defaultCurrency && (
+                        <span>Reading: {new Date(bill.reading_date).toLocaleDateString()}</span>
+                        {bill.currency !== defaultCurrency && (
                           <>
                             <span>•</span>
                             <span style={{
@@ -444,19 +755,19 @@ export function ElectricityList() {
                               fontSize: '12px',
                               fontWeight: '500'
                             }}>
-                              {formatCurrency(transaction.amount, transaction.currency)}
+                              {formatCurrency(bill.amount_paid, bill.currency)}
                             </span>
                           </>
                         )}
                       </div>
-                      {transaction.description && (
+                      {bill.notes && (
                         <p style={{
                           margin: '8px 0 0 0',
                           fontSize: '14px',
                           color: '#9ca3af',
                           fontStyle: 'italic'
                         }}>
-                          {transaction.description}
+                          {bill.notes}
                         </p>
                       )}
                     </div>
@@ -470,12 +781,21 @@ export function ElectricityList() {
                     <div style={{ textAlign: 'right' }}>
                       <p style={{
                         margin: '0 0 4px 0',
-                        fontSize: '18px',
+                        fontSize: '20px',
                         fontWeight: '700',
                         color: '#f59e0b'
                       }}>
                         {formatCurrency(convertedAmount, defaultCurrency)}
                       </p>
+                      {bill.total_usage && (
+                        <p style={{
+                          margin: 0,
+                          fontSize: '14px',
+                          color: '#6b7280'
+                        }}>
+                          {(convertedAmount / bill.total_usage).toFixed(3)} per kWh
+                        </p>
+                      )}
                     </div>
                     
                     <div style={{
@@ -503,7 +823,7 @@ export function ElectricityList() {
                       </button>
                       
                       <button
-                        onClick={() => setShowDeleteConfirm(transaction.id)}
+                        onClick={() => setShowDeleteConfirm(bill.id)}
                         style={{
                           padding: '8px',
                           background: 'rgba(239, 68, 68, 0.1)',
@@ -582,7 +902,7 @@ export function ElectricityList() {
               fontSize: '16px',
               lineHeight: '1.5'
             }}>
-              Are you sure you want to delete this electricity bill? This action cannot be undone.
+              Are you sure you want to delete this electricity bill? This action cannot be undone and will affect your usage forecasts.
             </p>
             
             <div style={{
@@ -617,37 +937,42 @@ export function ElectricityList() {
               
               <button
                 onClick={() => handleDelete(showDeleteConfirm)}
-                disabled={deleteTransaction.isPending}
+                disabled={deleteBill.isPending}
                 style={{
                   flex: 1,
                   padding: '12px 20px',
                   border: 'none',
-                  background: deleteTransaction.isPending 
+                  background: deleteBill.isPending 
                     ? '#9ca3af'
                     : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   color: 'white',
                   borderRadius: '12px',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: deleteTransaction.isPending ? 'not-allowed' : 'pointer',
+                  cursor: deleteBill.isPending ? 'not-allowed' : 'pointer',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
-                  if (!deleteTransaction.isPending) {
+                  if (!deleteBill.isPending) {
                     e.target.style.transform = 'translateY(-1px)'
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!deleteTransaction.isPending) {
+                  if (!deleteBill.isPending) {
                     e.target.style.transform = 'translateY(0)'
                   }
                 }}
               >
-                {deleteTransaction.isPending ? 'Deleting...' : 'Delete'}
+                {deleteBill.isPending ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Bill Form Modal */}
+      {showBillForm && (
+        <ElectricityBillForm onClose={() => setShowBillForm(false)} />
       )}
     </div>
   )
