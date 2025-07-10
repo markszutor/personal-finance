@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { 
   Home, 
   TrendingUp, 
+  TrendingDown,
   CreditCard, 
   Settings, 
   LogOut,
@@ -10,7 +11,10 @@ import {
   Wallet,
   Menu,
   X,
-  Plus
+  Plus,
+  BarChart3,
+  Bitcoin,
+  Building2
 } from 'lucide-react'
 
 interface LayoutProps {
@@ -25,8 +29,11 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
 
   const navigation = [
     { name: 'Dashboard', id: 'dashboard', icon: Home },
-    { name: 'Transactions', id: 'transactions', icon: CreditCard },
-    { name: 'Investments', id: 'investments', icon: TrendingUp },
+    { name: 'Income', id: 'income', icon: TrendingUp },
+    { name: 'Expenses', id: 'expenses', icon: TrendingDown },
+    { name: 'Stocks', id: 'stocks', icon: BarChart3 },
+    { name: 'Crypto', id: 'crypto', icon: Bitcoin },
+    { name: 'P2P Lending', id: 'p2p_lending', icon: Building2 },
     { name: 'Settings', id: 'settings', icon: Settings },
   ]
 
