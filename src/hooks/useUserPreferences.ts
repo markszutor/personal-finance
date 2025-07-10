@@ -16,9 +16,9 @@ export function useUserPreferences(userId?: string) {
         .from('user_preferences')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+      if (error) {
         throw error
       }
       
