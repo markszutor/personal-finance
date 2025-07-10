@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useCreateTransaction } from '../hooks/useTransactions'
+import { useCreateRecurringTransaction } from '../hooks/useRecurringTransactions'
 import { useUserPreferences } from '../hooks/useUserPreferences'
-import { getExchangeRate } from '../lib/utils'
-import { X, DollarSign, TrendingUp, TrendingDown, Tag, FileText, Globe } from 'lucide-react'
+import { getExchangeRate, calculateNextOccurrence } from '../lib/utils'
+import { X, DollarSign, TrendingUp, TrendingDown, Tag, FileText, Globe, Repeat, Calendar } from 'lucide-react'
 
 interface TransactionFormProps {
   onClose: () => void
@@ -37,6 +38,7 @@ const CURRENCIES = ['USD', 'EUR', 'GBP', 'HUF']
 export function TransactionForm({ onClose }: TransactionFormProps) {
   const { user } = useAuth()
   const createTransaction = useCreateTransaction()
+  const createRecurringTransaction = useCreateRecurringTransaction()
   const { data: preferences } = useUserPreferences(user?.id)
   
   const defaultCurrency = preferences?.default_currency || 'USD'
@@ -48,7 +50,10 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
     category: '',
     type: 'expense' as 'income' | 'expense',
     currency: defaultCurrency,
-    transaction_date: new Date().toISOString().split('T')[0]
+    transaction_date: new Date().toISOString().split('T')[0],
+    is_recurring: false,
+    frequency: 'monthly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
+    end_date: ''
   })
 
   const [loading, setLoading] = useState(false)
@@ -65,17 +70,39 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
         exchangeRate = await getExchangeRate(formData.currency, defaultCurrency)
       }
 
-      await createTransaction.mutateAsync({
-        user_id: user.id,
-        title: formData.title,
-        description: formData.description || null,
-        amount: parseFloat(formData.amount),
-        category: formData.category,
-        type: formData.type,
-        currency: formData.currency,
-        exchange_rate: exchangeRate,
-        transaction_date: formData.transaction_date
-      })
+      if (formData.is_recurring) {
+        // Create recurring transaction
+        const nextOccurrence = calculateNextOccurrence(formData.transaction_date, formData.frequency)
+        
+        await createRecurringTransaction.mutateAsync({
+          user_id: user.id,
+          title: formData.title,
+          description: formData.description || null,
+          amount: parseFloat(formData.amount),
+          category: formData.category,
+          type: formData.type,
+          currency: formData.currency,
+          exchange_rate: exchangeRate,
+          frequency: formData.frequency,
+          start_date: formData.transaction_date,
+          end_date: formData.end_date || null,
+          next_occurrence: nextOccurrence,
+          is_active: true
+        })
+      } else {
+        // Create one-time transaction
+        await createTransaction.mutateAsync({
+          user_id: user.id,
+          title: formData.title,
+          description: formData.description || null,
+          amount: parseFloat(formData.amount),
+          category: formData.category,
+          type: formData.type,
+          currency: formData.currency,
+          exchange_rate: exchangeRate,
+          transaction_date: formData.transaction_date
+        })
+      }
       onClose()
     } catch (error) {
       console.error('Error creating transaction:', error)

@@ -63,6 +63,115 @@ export type Database = {
           exchange_rate?: number | null
         }
       }
+      recurring_transactions: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          description: string | null
+          amount: number
+          category: string
+          type: 'income' | 'expense'
+          currency: string
+          exchange_rate: number | null
+          frequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
+          start_date: string
+          end_date: string | null
+          next_occurrence: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description?: string | null
+          amount: number
+          category: string
+          type: 'income' | 'expense'
+          currency?: string
+          exchange_rate?: number | null
+          frequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
+          start_date: string
+          end_date?: string | null
+          next_occurrence: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          amount?: number
+          category?: string
+          type?: 'income' | 'expense'
+          currency?: string
+          exchange_rate?: number | null
+          frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly'
+          start_date?: string
+          end_date?: string | null
+          next_occurrence?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      recurring_investments: {
+        Row: {
+          id: string
+          user_id: string
+          symbol: string
+          name: string
+          type: 'stocks' | 'crypto' | 'p2p_lending' | 'other'
+          amount: number
+          currency: string
+          exchange_rate: number | null
+          frequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
+          start_date: string
+          end_date: string | null
+          next_occurrence: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          symbol: string
+          name: string
+          type: 'stocks' | 'crypto' | 'p2p_lending' | 'other'
+          amount: number
+          currency?: string
+          exchange_rate?: number | null
+          frequency: 'daily' | 'weekly' | 'monthly' | 'yearly'
+          start_date: string
+          end_date?: string | null
+          next_occurrence: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          symbol?: string
+          name?: string
+          type?: 'stocks' | 'crypto' | 'p2p_lending' | 'other'
+          amount?: number
+          currency?: string
+          exchange_rate?: number | null
+          frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly'
+          start_date?: string
+          end_date?: string | null
+          next_occurrence?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       investments: {
         Row: {
           id: string

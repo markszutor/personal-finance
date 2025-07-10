@@ -67,3 +67,26 @@ export function convertCurrency(
   const rate = exchangeRate || EXCHANGE_RATES[fromCurrency]?.[toCurrency] || 1.0
   return amount * rate
 }
+
+export function calculateNextOccurrence(startDate: string, frequency: string): string {
+  const date = new Date(startDate)
+  
+  switch (frequency) {
+    case 'daily':
+      date.setDate(date.getDate() + 1)
+      break
+    case 'weekly':
+      date.setDate(date.getDate() + 7)
+      break
+    case 'monthly':
+      date.setMonth(date.getMonth() + 1)
+      break
+    case 'yearly':
+      date.setFullYear(date.getFullYear() + 1)
+      break
+    default:
+      date.setMonth(date.getMonth() + 1) // Default to monthly
+  }
+  
+  return date.toISOString().split('T')[0]
+}
