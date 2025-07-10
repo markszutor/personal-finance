@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useUserPreferences, useCreateUserPreferences, useUpdateUserPreferences } from '../hooks/useUserPreferences'
-import { Settings as SettingsIcon, Globe, Save, Check, Sparkles } from 'lucide-react'
+import { Settings as SettingsIcon, Globe, Save, Check, Sparkles, Calendar } from 'lucide-react'
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', symbol: '$' },
