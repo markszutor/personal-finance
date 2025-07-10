@@ -7,7 +7,9 @@ import {
   Settings, 
   LogOut,
   PlusCircle,
-  Wallet
+  Wallet,
+  Menu,
+  X
 } from 'lucide-react'
 
 interface LayoutProps {
@@ -18,6 +20,7 @@ interface LayoutProps {
 
 export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
   const { signOut } = useAuth()
+  const [sidebarOpen, setSidebarOpen] = React.useState(false)
 
   const navigation = [
     { name: 'Dashboard', id: 'dashboard', icon: Home },
@@ -30,75 +33,252 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
     await signOut()
   }
 
+  const handlePageChange = (page: string) => {
+    onPageChange(page)
+    setSidebarOpen(false)
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+    }}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          left: '20px',
+          zIndex: 60,
+          display: window.innerWidth >= 1024 ? 'none' : 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '48px',
+          height: '48px',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          cursor: 'pointer'
+        }}
+      >
+        {sidebarOpen ? <X size={24} color="#374151" /> : <Menu size={24} color="#374151" />}
+      </button>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && window.innerWidth < 1024 && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 40,
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-50 w-72 bg-white/80 backdrop-blur-xl border-r border-white/20 shadow-2xl">
-        <div className="flex h-20 items-center justify-center border-b border-gray-100/50">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg">
-              <Wallet className="h-7 w-7 text-white" />
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        width: '280px',
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+        zIndex: 50,
+        transform: window.innerWidth < 1024 ? (sidebarOpen ? 'translateX(0)' : 'translateX(-100%)') : 'translateX(0)',
+        transition: 'transform 0.3s ease-in-out',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Logo */}
+        <div style={{
+          padding: '32px 24px',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '12px',
+              borderRadius: '16px',
+              boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)'
+            }}>
+              <Wallet size={24} color="white" />
             </div>
             <div>
-              <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <h1 style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                margin: 0,
+                background: 'linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
                 FinanceHub
-              </span>
-              <p className="text-xs text-gray-500 font-medium">Personal Finance</p>
+              </h1>
+              <p style={{
+                margin: 0,
+                fontSize: '12px',
+                color: '#6b7280',
+                fontWeight: '500'
+              }}>
+                Personal Finance
+              </p>
             </div>
           </div>
         </div>
         
-        <nav className="mt-8 px-6">
-          <ul className="space-y-2">
+        {/* Navigation */}
+        <nav style={{
+          flex: 1,
+          padding: '24px 16px',
+          overflowY: 'auto'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {navigation.map((item) => {
               const Icon = item.icon
+              const isActive = currentPage === item.id
               return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => onPageChange(item.id)}
-                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                      currentPage === item.id
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className={`mr-3 h-5 w-5 transition-transform duration-200 ${
-                      currentPage === item.id ? 'scale-110' : 'group-hover:scale-105'
-                    }`} />
-                    {item.name}
-                  </button>
-                </li>
+                <button
+                  key={item.id}
+                  onClick={() => handlePageChange(item.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '16px 20px',
+                    borderRadius: '16px',
+                    border: 'none',
+                    background: isActive 
+                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                      : 'transparent',
+                    color: isActive ? 'white' : '#374151',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    width: '100%',
+                    textAlign: 'left',
+                    boxShadow: isActive ? '0 8px 24px rgba(102, 126, 234, 0.3)' : 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.target.style.background = 'rgba(102, 126, 234, 0.1)'
+                      e.target.style.transform = 'translateX(4px)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.target.style.background = 'transparent'
+                      e.target.style.transform = 'translateX(0)'
+                    }
+                  }}
+                >
+                  <Icon size={20} style={{
+                    transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                    transition: 'transform 0.2s ease'
+                  }} />
+                  {item.name}
+                </button>
               )
             })}
-          </ul>
+          </div>
         </nav>
 
-        <div className="absolute bottom-6 left-6 right-6">
+        {/* Sign Out Button */}
+        <div style={{
+          padding: '16px',
+          borderTop: '1px solid rgba(0, 0, 0, 0.05)'
+        }}>
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-200 group"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '16px 20px',
+              borderRadius: '16px',
+              border: 'none',
+              background: 'transparent',
+              color: '#ef4444',
+              fontSize: '15px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              width: '100%',
+              textAlign: 'left'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(239, 68, 68, 0.1)'
+              e.target.style.transform = 'translateX(4px)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'transparent'
+              e.target.style.transform = 'translateX(0)'
+            }}
           >
-            <LogOut className="mr-3 h-5 w-5 group-hover:scale-105 transition-transform duration-200" />
+            <LogOut size={20} />
             Sign Out
           </button>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="pl-72">
-        <main className="py-8">
-          <div className="mx-auto max-w-7xl px-8">
-            {children}
-          </div>
-        </main>
+      {/* Main Content */}
+      <div style={{
+        marginLeft: window.innerWidth >= 1024 ? '280px' : '0',
+        minHeight: '100vh',
+        padding: window.innerWidth >= 1024 ? '40px' : '80px 20px 20px 20px'
+      }}>
+        <div style={{
+          maxWidth: '1400px',
+          margin: '0 auto'
+        }}>
+          {children}
+        </div>
       </div>
 
       {/* Floating Action Button */}
       <button
         onClick={() => onPageChange('add-transaction')}
-        className="fixed bottom-8 right-8 h-16 w-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl shadow-2xl hover:shadow-blue-500/25 hover:scale-105 transition-all duration-200 flex items-center justify-center group"
+        style={{
+          position: 'fixed',
+          bottom: '32px',
+          right: '32px',
+          width: '64px',
+          height: '64px',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          border: 'none',
+          borderRadius: '20px',
+          boxShadow: '0 12px 40px rgba(102, 126, 234, 0.4)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.3s ease',
+          zIndex: 30
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.transform = 'scale(1.1) rotate(90deg)'
+          e.target.style.boxShadow = '0 16px 50px rgba(102, 126, 234, 0.6)'
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.transform = 'scale(1) rotate(0deg)'
+          e.target.style.boxShadow = '0 12px 40px rgba(102, 126, 234, 0.4)'
+        }}
       >
-        <PlusCircle className="h-7 w-7 group-hover:rotate-90 transition-transform duration-200" />
+        <PlusCircle size={28} color="white" />
       </button>
     </div>
   )

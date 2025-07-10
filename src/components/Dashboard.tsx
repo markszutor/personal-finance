@@ -12,9 +12,12 @@ import {
   ArrowDownRight,
   Sparkles,
   Target,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  BarChart3,
+  Calendar,
+  Eye
 } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 export function Dashboard() {
   const { user } = useAuth()
@@ -23,11 +26,26 @@ export function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200"></div>
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent absolute top-0"></div>
-        </div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '400px'
+      }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          border: '4px solid #e5e7eb',
+          borderTop: '4px solid #667eea',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     )
   }
@@ -51,7 +69,7 @@ export function Dashboard() {
   const netWorth = totalIncome - totalExpenses
 
   // Get recent transactions
-  const recentTransactions = convertedTransactions.slice(0, 6)
+  const recentTransactions = convertedTransactions.slice(0, 5)
 
   // Prepare chart data
   const monthlyData = convertedTransactions.reduce((acc, transaction) => {
@@ -89,108 +107,209 @@ export function Dashboard() {
     return acc
   }, [] as Array<{ name: string; value: number }>)
 
-  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
+  const COLORS = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
+
+  const StatCard = ({ title, value, icon: Icon, gradient, textColor, bgColor }: any) => (
+    <div style={{
+      background: `linear-gradient(135deg, ${gradient[0]} 0%, ${gradient[1]} 100%)`,
+      borderRadius: '24px',
+      padding: '32px',
+      position: 'relative',
+      overflow: 'hidden',
+      boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: '-20px',
+        right: '-20px',
+        width: '100px',
+        height: '100px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '50%'
+      }} />
+      <div style={{
+        position: 'relative',
+        zIndex: 2
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '16px'
+        }}>
+          <p style={{
+            margin: 0,
+            fontSize: '14px',
+            fontWeight: '600',
+            color: textColor,
+            opacity: 0.9
+          }}>
+            {title}
+          </p>
+          <div style={{
+            background: bgColor,
+            padding: '12px',
+            borderRadius: '16px',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
+          }}>
+            <Icon size={24} color="white" />
+          </div>
+        </div>
+        <p style={{
+          margin: 0,
+          fontSize: '32px',
+          fontWeight: '700',
+          color: textColor,
+          lineHeight: '1.2'
+        }}>
+          {value}
+        </p>
+      </div>
+    </div>
+  )
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px'
+      }}>
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+          <h1 style={{
+            fontSize: '36px',
+            fontWeight: '700',
+            margin: '0 0 8px 0',
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
             Financial Overview
           </h1>
-          <p className="mt-2 text-gray-600 flex items-center">
-            <Sparkles className="h-4 w-4 mr-2 text-blue-500" />
+          <p style={{
+            margin: 0,
+            color: '#6b7280',
+            fontSize: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <Sparkles size={16} color="#667eea" />
             Welcome back! Here's your financial snapshot in {defaultCurrency}
           </p>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-500">Default Currency</p>
-          <p className="text-lg font-semibold text-gray-900">{defaultCurrency}</p>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          padding: '16px 24px',
+          borderRadius: '16px',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          textAlign: 'center'
+        }}>
+          <p style={{
+            margin: '0 0 4px 0',
+            fontSize: '12px',
+            color: '#6b7280',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            Default Currency
+          </p>
+          <p style={{
+            margin: 0,
+            fontSize: '18px',
+            fontWeight: '700',
+            color: '#1a1a1a'
+          }}>
+            {defaultCurrency}
+          </p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 border border-green-200/50 shadow-lg shadow-green-500/10">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-700">Total Income</p>
-              <p className="text-3xl font-bold text-green-900 mt-1">
-                {formatCurrency(totalIncome, defaultCurrency)}
-              </p>
-            </div>
-            <div className="p-3 bg-green-500 rounded-xl shadow-lg">
-              <TrendingUp className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <div className="absolute -bottom-2 -right-2 w-20 h-20 bg-green-200/30 rounded-full"></div>
-        </div>
-
-        <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 rounded-2xl p-6 border border-red-200/50 shadow-lg shadow-red-500/10">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-red-700">Total Expenses</p>
-              <p className="text-3xl font-bold text-red-900 mt-1">
-                {formatCurrency(totalExpenses, defaultCurrency)}
-              </p>
-            </div>
-            <div className="p-3 bg-red-500 rounded-xl shadow-lg">
-              <TrendingDown className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <div className="absolute -bottom-2 -right-2 w-20 h-20 bg-red-200/30 rounded-full"></div>
-        </div>
-
-        <div className={`relative overflow-hidden rounded-2xl p-6 border shadow-lg ${
-          netWorth >= 0 
-            ? 'bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200/50 shadow-blue-500/10' 
-            : 'bg-gradient-to-br from-orange-50 to-amber-100 border-orange-200/50 shadow-orange-500/10'
-        }`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-sm font-medium ${netWorth >= 0 ? 'text-blue-700' : 'text-orange-700'}`}>
-                Net Worth
-              </p>
-              <p className={`text-3xl font-bold mt-1 ${netWorth >= 0 ? 'text-blue-900' : 'text-orange-900'}`}>
-                {formatCurrency(netWorth, defaultCurrency)}
-              </p>
-            </div>
-            <div className={`p-3 rounded-xl shadow-lg ${netWorth >= 0 ? 'bg-blue-500' : 'bg-orange-500'}`}>
-              <Target className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <div className={`absolute -bottom-2 -right-2 w-20 h-20 rounded-full ${
-            netWorth >= 0 ? 'bg-blue-200/30' : 'bg-orange-200/30'
-          }`}></div>
-        </div>
-
-        <div className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 rounded-2xl p-6 border border-purple-200/50 shadow-lg shadow-purple-500/10">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-purple-700">Transactions</p>
-              <p className="text-3xl font-bold text-purple-900 mt-1">
-                {transactions.length}
-              </p>
-            </div>
-            <div className="p-3 bg-purple-500 rounded-xl shadow-lg">
-              <CreditCard className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <div className="absolute -bottom-2 -right-2 w-20 h-20 bg-purple-200/30 rounded-full"></div>
-        </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '24px'
+      }}>
+        <StatCard
+          title="Total Income"
+          value={formatCurrency(totalIncome, defaultCurrency)}
+          icon={TrendingUp}
+          gradient={['#10b981', '#059669']}
+          textColor="#065f46"
+          bgColor="rgba(16, 185, 129, 0.2)"
+        />
+        <StatCard
+          title="Total Expenses"
+          value={formatCurrency(totalExpenses, defaultCurrency)}
+          icon={TrendingDown}
+          gradient={['#ef4444', '#dc2626']}
+          textColor="#7f1d1d"
+          bgColor="rgba(239, 68, 68, 0.2)"
+        />
+        <StatCard
+          title="Net Worth"
+          value={formatCurrency(netWorth, defaultCurrency)}
+          icon={Target}
+          gradient={netWorth >= 0 ? ['#667eea', '#764ba2'] : ['#f59e0b', '#d97706']}
+          textColor={netWorth >= 0 ? '#1e1b4b' : '#78350f'}
+          bgColor={netWorth >= 0 ? 'rgba(102, 126, 234, 0.2)' : 'rgba(245, 158, 11, 0.2)'}
+        />
+        <StatCard
+          title="Transactions"
+          value={transactions.length.toString()}
+          icon={CreditCard}
+          gradient={['#8b5cf6', '#7c3aed']}
+          textColor="#581c87"
+          bgColor="rgba(139, 92, 246, 0.2)"
+        />
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: window.innerWidth >= 1024 ? '1fr 1fr' : '1fr',
+        gap: '32px'
+      }}>
         {/* Monthly Overview */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-xl">
-          <div className="flex items-center mb-6">
-            <div className="p-2 bg-blue-100 rounded-lg mr-3">
-              <BarChart className="h-5 w-5 text-blue-600" />
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          padding: '32px',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '24px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '12px',
+              borderRadius: '12px'
+            }}>
+              <BarChart3 size={20} color="white" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">Monthly Overview</h3>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              Monthly Overview
+            </h3>
           </div>
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
@@ -211,14 +330,37 @@ export function Dashboard() {
         </div>
 
         {/* Category Breakdown */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-xl">
-          <div className="flex items-center mb-6">
-            <div className="p-2 bg-purple-100 rounded-lg mr-3">
-              <PieChartIcon className="h-5 w-5 text-purple-600" />
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          padding: '32px',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '24px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              padding: '12px',
+              borderRadius: '12px'
+            }}>
+              <PieChartIcon size={20} color="white" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">Category Breakdown</h3>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              Category Breakdown
+            </h3>
           </div>
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={categoryData}
@@ -249,62 +391,182 @@ export function Dashboard() {
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-xl">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-indigo-100 rounded-lg mr-3">
-              <CreditCard className="h-5 w-5 text-indigo-600" />
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '32px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '24px',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              padding: '12px',
+              borderRadius: '12px'
+            }}>
+              <Eye size={20} color="white" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">Recent Transactions</h3>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              Recent Transactions
+            </h3>
           </div>
-          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+          <div style={{
+            background: 'rgba(102, 126, 234, 0.1)',
+            color: '#667eea',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>
             Last {recentTransactions.length} transactions
-          </span>
+          </div>
         </div>
+
         {recentTransactions.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <CreditCard className="h-8 w-8 text-gray-400" />
+          <div style={{
+            textAlign: 'center',
+            padding: '60px 20px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+              width: '80px',
+              height: '80px',
+              borderRadius: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px auto'
+            }}>
+              <CreditCard size={32} color="#9ca3af" />
             </div>
-            <p className="text-gray-500 text-lg">No transactions yet</p>
-            <p className="text-gray-400 text-sm mt-1">Add your first transaction to get started!</p>
+            <h4 style={{
+              margin: '0 0 8px 0',
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#374151'
+            }}>
+              No transactions yet
+            </h4>
+            <p style={{
+              margin: 0,
+              color: '#6b7280',
+              fontSize: '16px'
+            }}>
+              Add your first transaction to get started!
+            </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
             {recentTransactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between p-4 bg-white/50 rounded-xl border border-white/30 hover:bg-white/70 transition-all duration-200">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-xl ${
-                    transaction.type === 'income' 
-                      ? 'bg-green-100 text-green-600' 
-                      : 'bg-red-100 text-red-600'
-                  }`}>
+              <div key={transaction.id} style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '20px',
+                background: 'rgba(255, 255, 255, 0.6)',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)'
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.6)'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    background: transaction.type === 'income' 
+                      ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' 
+                      : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  }}>
                     {transaction.type === 'income' ? (
-                      <ArrowUpRight className="h-5 w-5" />
+                      <ArrowUpRight size={20} color="white" />
                     ) : (
-                      <ArrowDownRight className="h-5 w-5" />
+                      <ArrowDownRight size={20} color="white" />
                     )}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{transaction.title}</p>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <h4 style={{
+                      margin: '0 0 4px 0',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: '#1a1a1a'
+                    }}>
+                      {transaction.title}
+                    </h4>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      fontSize: '14px',
+                      color: '#6b7280'
+                    }}>
                       <span>{transaction.category}</span>
                       {transaction.currency !== defaultCurrency && (
-                        <span className="bg-gray-200 px-2 py-0.5 rounded text-xs">
+                        <span style={{
+                          background: '#f3f4f6',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: '500'
+                        }}>
                           {formatCurrency(transaction.amount, transaction.currency)}
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className={`font-bold text-lg ${
-                    transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{
+                    margin: '0 0 4px 0',
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: transaction.type === 'income' ? '#10b981' : '#ef4444'
+                  }}>
                     {transaction.type === 'income' ? '+' : '-'}
                     {formatCurrency(transaction.convertedAmount, defaultCurrency)}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p style={{
+                    margin: 0,
+                    fontSize: '14px',
+                    color: '#6b7280'
+                  }}>
                     {new Date(transaction.created_at).toLocaleDateString()}
                   </p>
                 </div>
