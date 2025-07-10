@@ -278,7 +278,8 @@ export function Auth() {
                       type="email"
                       required
                       style={{
-                        width: '100%',
+                        width: 'calc(100% - 32px)',
+                        boxSizing: 'border-box',
                         paddingLeft: '48px',
                         paddingRight: '16px',
                         paddingTop: '16px',
@@ -330,7 +331,8 @@ export function Auth() {
                       type={showPassword ? 'text' : 'password'}
                       required
                       style={{
-                        width: '100%',
+                        width: 'calc(100% - 32px)',
+                        boxSizing: 'border-box',
                         paddingLeft: '48px',
                         paddingRight: '48px',
                         paddingTop: '16px',
@@ -394,7 +396,8 @@ export function Auth() {
                   type="submit"
                   disabled={loading}
                   style={{
-                    width: '100%',
+                    width: 'calc(100% - 32px)',
+                    boxSizing: 'border-box',
                     background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
                     padding: '16px 24px',
