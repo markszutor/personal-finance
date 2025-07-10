@@ -685,6 +685,7 @@ export function TransactionForm({ onClose }: TransactionFormProps) {
               }}
             >
               {loading ? 'Adding...' : `Add ${formData.type === 'income' ? 'Income' : 'Expense'}`}
+              {formData.is_recurring && ' (Recurring)'}
             </button>
           </div>
         </form>

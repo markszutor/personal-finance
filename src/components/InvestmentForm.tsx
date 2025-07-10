@@ -50,18 +50,39 @@ export function InvestmentForm({ onClose }: InvestmentFormProps) {
         exchangeRate = await getExchangeRate(formData.currency, defaultCurrency)
       }
 
-      await createInvestment.mutateAsync({
-        user_id: user.id,
-        symbol: formData.symbol.toUpperCase(),
-        name: formData.name,
-        type: formData.type,
-        quantity: parseFloat(formData.quantity),
-        purchase_price: parseFloat(formData.purchase_price),
-        current_price: parseFloat(formData.current_price),
-        currency: formData.currency,
-        exchange_rate: exchangeRate,
-        purchase_date: formData.purchase_date
-      })
+      if (formData.is_recurring) {
+        // Create recurring investment
+        const nextOccurrence = calculateNextOccurrence(formData.purchase_date, formData.frequency)
+        
+        await createRecurringInvestment.mutateAsync({
+          user_id: user.id,
+          symbol: formData.symbol.toUpperCase(),
+          name: formData.name,
+          type: formData.type,
+          amount: parseFloat(formData.quantity) * parseFloat(formData.purchase_price),
+          currency: formData.currency,
+          exchange_rate: exchangeRate,
+          frequency: formData.frequency,
+          start_date: formData.purchase_date,
+          end_date: formData.end_date || null,
+          next_occurrence: nextOccurrence,
+          is_active: true
+        })
+      } else {
+        // Create one-time investment
+        await createInvestment.mutateAsync({
+          user_id: user.id,
+          symbol: formData.symbol.toUpperCase(),
+          name: formData.name,
+          type: formData.type,
+          quantity: parseFloat(formData.quantity),
+          purchase_price: parseFloat(formData.purchase_price),
+          current_price: parseFloat(formData.current_price),
+          currency: formData.currency,
+          exchange_rate: exchangeRate,
+          purchase_date: formData.purchase_date
+        })
+      }
       onClose()
     } catch (error) {
       console.error('Error creating investment:', error)
