@@ -10,7 +10,8 @@ import {
   Sparkles,
   TrendingUp,
   Shield,
-  Zap
+  Zap,
+  CheckCircle
 } from 'lucide-react'
 
 export function Auth() {
@@ -44,82 +45,206 @@ export function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+    }}>
+      {/* Background Pattern */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `
+          radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+          radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%)
+        `,
+        pointerEvents: 'none'
+      }} />
 
-      <div className="relative z-10 flex min-h-screen">
-        {/* Left side - Branding */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-16">
-          <div className="max-w-md">
-            <div className="flex items-center space-x-3 mb-8">
-              <div className="p-3 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl shadow-2xl">
-                <Wallet className="h-8 w-8 text-white" />
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        width: '100%',
+        maxWidth: '1200px',
+        display: 'grid',
+        gridTemplateColumns: window.innerWidth >= 1024 ? '1fr 1fr' : '1fr',
+        gap: '60px',
+        alignItems: 'center'
+      }}>
+        {/* Left Panel - Branding */}
+        {window.innerWidth >= 1024 && (
+          <div style={{
+            padding: '60px 40px',
+            color: 'white'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '40px'
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '16px',
+                borderRadius: '20px',
+                marginRight: '16px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+              }}>
+                <Wallet size={32} color="white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">FinanceHub</h1>
-                <p className="text-purple-200 text-sm">Personal Finance Tracker</p>
+                <h1 style={{
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  margin: 0,
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  FinanceHub
+                </h1>
+                <p style={{
+                  margin: 0,
+                  opacity: 0.8,
+                  fontSize: '14px'
+                }}>
+                  Personal Finance Tracker
+                </p>
               </div>
             </div>
-            
-            <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
-              Take control of your
-              <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"> financial future</span>
+
+            <h2 style={{
+              fontSize: '48px',
+              fontWeight: '700',
+              lineHeight: '1.2',
+              marginBottom: '24px',
+              background: 'linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              Take control of your financial future
             </h2>
-            
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+
+            <p style={{
+              fontSize: '20px',
+              lineHeight: '1.6',
+              marginBottom: '40px',
+              opacity: 0.9
+            }}>
               Track expenses, manage investments, and achieve your financial goals with our intelligent platform.
             </p>
 
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 text-gray-300">
-                <div className="p-2 bg-purple-500/20 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-purple-400" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {[
+                { icon: TrendingUp, text: 'Real-time financial insights' },
+                { icon: Shield, text: 'Bank-level security' },
+                { icon: Zap, text: 'Multi-currency support' }
+              ].map((feature, index) => (
+                <div key={index} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    background: 'rgba(255,255,255,0.2)',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    backdropFilter: 'blur(10px)'
+                  }}>
+                    <feature.icon size={20} color="white" />
+                  </div>
+                  <span style={{ fontSize: '16px', opacity: 0.9 }}>
+                    {feature.text}
+                  </span>
                 </div>
-                <span>Real-time financial insights</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-300">
-                <div className="p-2 bg-blue-500/20 rounded-lg">
-                  <Shield className="h-5 w-5 text-blue-400" />
-                </div>
-                <span>Bank-level security</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-300">
-                <div className="p-2 bg-indigo-500/20 rounded-lg">
-                  <Zap className="h-5 w-5 text-indigo-400" />
-                </div>
-                <span>Multi-currency support</span>
-              </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Right side - Auth form */}
-        <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-8">
-          <div className="w-full max-w-md">
-            {/* Mobile branding */}
-            <div className="lg:hidden text-center mb-8">
-              <div className="flex items-center justify-center space-x-3 mb-4">
-                <div className="p-3 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl shadow-2xl">
-                  <Wallet className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-white">FinanceHub</h1>
-                  <p className="text-purple-200 text-sm">Personal Finance Tracker</p>
+        {/* Right Panel - Auth Form */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '440px'
+          }}>
+            {/* Mobile Header */}
+            {window.innerWidth < 1024 && (
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '40px',
+                color: 'white'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    padding: '16px',
+                    borderRadius: '20px',
+                    marginRight: '16px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                  }}>
+                    <Wallet size={32} color="white" />
+                  </div>
+                  <div>
+                    <h1 style={{
+                      fontSize: '28px',
+                      fontWeight: '700',
+                      margin: 0
+                    }}>
+                      FinanceHub
+                    </h1>
+                    <p style={{
+                      margin: 0,
+                      opacity: 0.8,
+                      fontSize: '14px'
+                    }}>
+                      Personal Finance Tracker
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-white mb-2">
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '24px',
+              padding: '40px',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '32px'
+              }}>
+                <h2 style={{
+                  fontSize: '28px',
+                  fontWeight: '700',
+                  margin: '0 0 8px 0',
+                  color: '#1a1a1a'
+                }}>
                   {isSignUp ? 'Create Account' : 'Welcome Back'}
                 </h2>
-                <p className="text-gray-300">
+                <p style={{
+                  margin: 0,
+                  color: '#666',
+                  fontSize: '16px'
+                }}>
                   {isSignUp 
                     ? 'Start your financial journey today' 
                     : 'Sign in to continue to your dashboard'
@@ -127,50 +252,140 @@ export function Auth() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">
+              <form onSubmit={handleSubmit}>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Email Address
                   </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <div style={{ position: 'relative' }}>
+                    <Mail 
+                      size={20} 
+                      color="#9CA3AF" 
+                      style={{
+                        position: 'absolute',
+                        left: '16px',
+                        top: '50%',
+                        transform: 'translateY(-50%)'
+                      }}
+                    />
                     <input
                       type="email"
                       required
-                      className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all backdrop-blur-sm"
+                      style={{
+                        width: '100%',
+                        paddingLeft: '48px',
+                        paddingRight: '16px',
+                        paddingTop: '16px',
+                        paddingBottom: '16px',
+                        border: '2px solid #E5E7EB',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        outline: 'none',
+                        transition: 'all 0.2s ease',
+                        backgroundColor: '#FAFAFA'
+                      }}
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#667eea'
+                        e.target.style.backgroundColor = '#ffffff'
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#E5E7EB'
+                        e.target.style.backgroundColor = '#FAFAFA'
+                      }}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Password
                   </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <div style={{ position: 'relative' }}>
+                    <Lock 
+                      size={20} 
+                      color="#9CA3AF" 
+                      style={{
+                        position: 'absolute',
+                        left: '16px',
+                        top: '50%',
+                        transform: 'translateY(-50%)'
+                      }}
+                    />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      className="w-full pl-12 pr-12 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all backdrop-blur-sm"
+                      style={{
+                        width: '100%',
+                        paddingLeft: '48px',
+                        paddingRight: '48px',
+                        paddingTop: '16px',
+                        paddingBottom: '16px',
+                        border: '2px solid #E5E7EB',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        outline: 'none',
+                        transition: 'all 0.2s ease',
+                        backgroundColor: '#FAFAFA'
+                      }}
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#667eea'
+                        e.target.style.backgroundColor = '#ffffff'
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#E5E7EB'
+                        e.target.style.backgroundColor = '#FAFAFA'
+                      }}
                     />
                     <button
                       type="button"
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
+                      style={{
+                        position: 'absolute',
+                        right: '16px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px'
+                      }}
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showPassword ? 
+                        <EyeOff size={20} color="#9CA3AF" /> : 
+                        <Eye size={20} color="#9CA3AF" />
+                      }
                     </button>
                   </div>
                 </div>
 
                 {error && (
-                  <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-2xl backdrop-blur-sm">
+                  <div style={{
+                    background: '#FEF2F2',
+                    border: '1px solid #FECACA',
+                    color: '#DC2626',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    marginBottom: '24px',
+                    fontSize: '14px'
+                  }}>
                     {error}
                   </div>
                 )}
@@ -178,22 +393,67 @@ export function Auth() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-2xl font-semibold hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2 shadow-xl"
+                  style={{
+                    width: '100%',
+                    background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    padding: '16px 24px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.target.style.transform = 'translateY(-2px)'
+                      e.target.style.boxShadow = '0 8px 20px rgba(102, 126, 234, 0.6)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) {
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)'
+                    }
+                  }}
                 >
                   {loading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      border: '2px solid #ffffff',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }} />
                   ) : (
                     <>
                       <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
-                      <ArrowRight className="h-5 w-5" />
+                      <ArrowRight size={20} />
                     </>
                   )}
                 </button>
 
-                <div className="text-center">
+                <div style={{
+                  textAlign: 'center',
+                  marginTop: '24px'
+                }}>
                   <button
                     type="button"
-                    className="text-gray-300 hover:text-white transition-colors text-sm"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#667eea',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      textDecoration: 'underline'
+                    }}
                     onClick={() => setIsSignUp(!isSignUp)}
                   >
                     {isSignUp 
@@ -205,23 +465,49 @@ export function Auth() {
               </form>
 
               {isSignUp && (
-                <div className="mt-6 p-4 bg-purple-500/10 border border-purple-500/20 rounded-2xl">
-                  <div className="flex items-center space-x-2 text-purple-200 text-sm">
-                    <Sparkles className="h-4 w-4" />
+                <div style={{
+                  marginTop: '24px',
+                  padding: '16px',
+                  background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+                  borderRadius: '12px',
+                  border: '1px solid #C7D2FE'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: '#4338CA',
+                    fontSize: '14px'
+                  }}>
+                    <Sparkles size={16} />
                     <span>Join thousands of users managing their finances smarter</span>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="mt-8 text-center">
-              <p className="text-gray-400 text-sm">
-                Secure • Private • Encrypted
+            <div style={{
+              textAlign: 'center',
+              marginTop: '24px'
+            }}>
+              <p style={{
+                color: window.innerWidth >= 1024 ? 'rgba(255,255,255,0.7)' : '#666',
+                fontSize: '14px',
+                margin: 0
+              }}>
+                🔒 Secure • 🔐 Private • 🛡️ Encrypted
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
