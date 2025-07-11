@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useElectricityBills, useElectricityBillForecast, useDeleteElectricityBill } from '../hooks/useElectricityBills'
+import { usePropertyAddresses, useCurrentPropertyAddress } from '../hooks/usePropertyAddresses'
 import { useUserPreferences } from '../hooks/useUserPreferences'
 import { ElectricityBillForm } from './ElectricityBillForm'
+import { PropertyAddressForm } from './PropertyAddressForm'
+import { ElectricityCharts } from './ElectricityCharts'
 import { DateFilter } from './DateFilter'
 import { formatCurrency, convertCurrency } from '../lib/utils'
 import { 
@@ -18,7 +21,10 @@ import {
   Activity,
   Target,
   BarChart3,
-  Lightbulb
+  Lightbulb,
+  Home,
+  MapPin,
+  Settings as SettingsIcon
 } from 'lucide-react'
 
 export function ElectricityList() {
@@ -27,9 +33,13 @@ export function ElectricityList() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
   const [showBillForm, setShowBillForm] = useState(false)
+  const [showAddressForm, setShowAddressForm] = useState(false)
+  const [showCharts, setShowCharts] = useState(false)
   
   const { data: bills = [], isLoading } = useElectricityBills(user?.id, dateRange)
   const { data: forecast } = useElectricityBillForecast(user?.id)
+  const { data: addresses = [] } = usePropertyAddresses(user?.id)
+  const { data: currentAddress } = useCurrentPropertyAddress(user?.id)
   const { data: preferences } = useUserPreferences(user?.id)
   const deleteBill = useDeleteElectricityBill()
 
@@ -168,6 +178,41 @@ export function ElectricityList() {
           >
             <Plus size={16} />
             Add Bill
+          </button>
+          <button
+            onClick={() => setShowCharts(!showCharts)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 20px',
+              background: showCharts 
+                ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+                : 'rgba(255, 255, 255, 0.8)',
+              color: showCharts ? 'white' : '#374151',
+              border: showCharts ? 'none' : '2px solid #e5e7eb',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: showCharts ? '0 4px 12px rgba(139, 92, 246, 0.3)' : 'none'
+            }}
+            onMouseEnter={(e) => {
+              if (!showCharts) {
+                e.target.style.borderColor = '#8b5cf6'
+                e.target.style.background = 'rgba(139, 92, 246, 0.05)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!showCharts) {
+                e.target.style.borderColor = '#e5e7eb'
+                e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+              }
+            }}
+          >
+            <BarChart3 size={16} />
+            {showCharts ? 'Hide Charts' : 'Show Charts'}
           </button>
         </div>
       </div>
@@ -457,6 +502,182 @@ export function ElectricityList() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Current Address Display */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '24px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: currentAddress ? '16px' : '0'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '12px',
+              borderRadius: '12px'
+            }}>
+              <Home size={20} color="white" />
+            </div>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1a1a1a'
+            }}>
+              Current Property
+            </h3>
+          </div>
+          <button
+            onClick={() => setShowAddressForm(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              background: 'rgba(102, 126, 234, 0.1)',
+              color: '#667eea',
+              border: '1px solid rgba(102, 126, 234, 0.2)',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(102, 126, 234, 0.15)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'rgba(102, 126, 234, 0.1)'
+            }}
+          >
+            <SettingsIcon size={14} />
+            Manage
+          </button>
+        </div>
+
+        {currentAddress ? (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            padding: '16px',
+            background: 'rgba(255, 255, 255, 0.6)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.3)'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              padding: '8px',
+              borderRadius: '8px'
+            }}>
+              <MapPin size={16} color="white" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h4 style={{
+                margin: '0 0 4px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1a1a1a'
+              }}>
+                {currentAddress.nickname || 'Current Property'}
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#6b7280'
+              }}>
+                {currentAddress.address_line_1}
+                {currentAddress.address_line_2 && `, ${currentAddress.address_line_2}`}
+                , {currentAddress.city}
+                {currentAddress.state_province && `, ${currentAddress.state_province}`}
+                {currentAddress.postal_code && ` ${currentAddress.postal_code}`}
+              </p>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginTop: '8px'
+              }}>
+                <span style={{
+                  background: currentAddress.has_day_night_meter ? '#10b98120' : '#f59e0b20',
+                  color: currentAddress.has_day_night_meter ? '#10b981' : '#f59e0b',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '500'
+                }}>
+                  {currentAddress.has_day_night_meter ? 'Day/Night Meter' : 'Single Meter'}
+                </span>
+                <span style={{
+                  fontSize: '12px',
+                  color: '#9ca3af'
+                }}>
+                  Since {new Date(currentAddress.move_in_date).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px 20px'
+          }}>
+            <p style={{
+              margin: '0 0 16px 0',
+              color: '#6b7280',
+              fontSize: '16px'
+            }}>
+              No current property address set. Add your address to better organize your electricity bills.
+            </p>
+            <button
+              onClick={() => setShowAddressForm(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)'
+                e.target.style.boxShadow = '0 8px 20px rgba(102, 126, 234, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)'
+                e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)'
+              }}
+            >
+              <Plus size={16} />
+              Add Property Address
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Charts Section */}
+      {showCharts && (
+        <ElectricityCharts months={12} />
       )}
 
       {/* Search Filter */}
@@ -973,6 +1194,11 @@ export function ElectricityList() {
       {/* Bill Form Modal */}
       {showBillForm && (
         <ElectricityBillForm onClose={() => setShowBillForm(false)} />
+      )}
+
+      {/* Address Form Modal */}
+      {showAddressForm && (
+        <PropertyAddressForm onClose={() => setShowAddressForm(false)} />
       )}
     </div>
   )

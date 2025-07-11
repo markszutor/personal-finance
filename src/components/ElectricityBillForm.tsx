@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useCreateElectricityBill, useElectricityBills } from '../hooks/useElectricityBills'
+import { useCurrentPropertyAddress } from '../hooks/usePropertyAddresses'
 import { useUserPreferences } from '../hooks/useUserPreferences'
 import { getExchangeRate } from '../lib/utils'
 import { X, Zap, DollarSign, Calendar, Hash, FileText, Globe, Calculator } from 'lucide-react'
@@ -16,6 +17,7 @@ export function ElectricityBillForm({ onClose }: ElectricityBillFormProps) {
   const createBill = useCreateElectricityBill()
   const { data: preferences } = useUserPreferences(user?.id)
   const { data: existingBills = [] } = useElectricityBills(user?.id)
+  const { data: currentAddress } = useCurrentPropertyAddress(user?.id)
   
   const defaultCurrency = preferences?.default_currency || 'USD'
   
@@ -53,6 +55,7 @@ export function ElectricityBillForm({ onClose }: ElectricityBillFormProps) {
 
       await createBill.mutateAsync({
         user_id: user.id,
+        property_address_id: currentAddress?.id,
         bill_date: formData.bill_date,
         reading_date: formData.reading_date,
         day_reading: parseFloat(formData.day_reading),
