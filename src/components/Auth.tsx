@@ -16,26 +16,39 @@ import {
 
 export function Auth() {
   const [isSignUp, setIsSignUp] = useState(false)
+  const [isResetPassword, setIsResetPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [resetSuccess, setResetSuccess] = useState(false)
 
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, resetPassword } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setResetSuccess(false)
 
     try {
-      const { error } = isSignUp 
-        ? await signUp(email, password)
-        : await signIn(email, password)
+      let result
+      if (isResetPassword) {
+        result = await resetPassword(email)
+        if (!result.error) {
+          setResetSuccess(true)
+          setLoading(false)
+          return
+        }
+      } else {
+        result = isSignUp 
+          ? await signUp(email, password)
+          : await signIn(email, password)
+      }
 
-      if (error) {
-        setError(error.message)
+      if (result.error) {
+        setError(result.error.message)
       }
     } catch (err) {
       setError('An unexpected error occurred')
@@ -238,20 +251,76 @@ export function Auth() {
                   margin: '0 0 8px 0',
                   color: '#1a1a1a'
                 }}>
-                  {isSignUp ? 'Create Account' : 'Welcome Back'}
+                  {isResetPassword ? 'Reset Password' : isSignUp ? 'Create Account' : 'Welcome Back'}
                 </h2>
                 <p style={{
                   margin: 0,
                   color: '#666',
                   fontSize: '16px'
                 }}>
-                  {isSignUp 
-                    ? 'Start your financial journey today' 
-                    : 'Sign in to continue to your dashboard'
+                  {isResetPassword
+                    ? 'Enter your email to receive a password reset link'
+                    : isSignUp 
+                      ? 'Start your financial journey today' 
+                      : 'Sign in to continue to your dashboard'
                   }
                 </p>
               </div>
 
+              {resetSuccess ? (
+                <div style={{
+                  padding: '20px',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                  textAlign: 'center',
+                  marginBottom: '24px'
+                }}>
+                  <h3 style={{
+                    margin: '0 0 8px 0',
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    color: '#065f46'
+                  }}>
+                    Reset Link Sent!
+                  </h3>
+                  <p style={{
+                    margin: 0,
+                    fontSize: '14px',
+                    color: '#047857'
+                  }}>
+                    Check your email for a password reset link. You can close this window.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsResetPassword(false)
+                      setResetSuccess(false)
+                      setEmail('')
+                    }}
+                    style={{
+                      marginTop: '16px',
+                      padding: '8px 16px',
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      color: '#10b981',
+                      border: '1px solid rgba(16, 185, 129, 0.2)',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = 'rgba(16, 185, 129, 0.15)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'rgba(16, 185, 129, 0.1)'
+                    }}
+                  >
+                    Back to Sign In
+                  </button>
+                </div>
+              ) : (
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: '24px' }}>
                   <label style={{
@@ -306,7 +375,8 @@ export function Auth() {
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '24px' }}>
+                {!isResetPassword && (
+                  <div style={{ marginBottom: '24px' }}>
                   <label style={{
                     display: 'block',
                     fontSize: '14px',
@@ -377,6 +447,7 @@ export function Auth() {
                     </button>
                   </div>
                 </div>
+                )}
 
                 {error && (
                   <div style={{
@@ -437,7 +508,9 @@ export function Auth() {
                     }} />
                   ) : (
                     <>
-                      <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
+                        <span>
+                          {isResetPassword ? 'Send Reset Link' : isSignUp ? 'Create Account' : 'Sign In'}
+                        </span>
                       <ArrowRight size={20} />
                     </>
                   )}
@@ -447,27 +520,76 @@ export function Auth() {
                   textAlign: 'center',
                   marginTop: '24px'
                 }}>
-                  <button
-                    type="button"
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#667eea',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      textDecoration: 'underline'
-                    }}
-                    onClick={() => setIsSignUp(!isSignUp)}
-                  >
-                    {isSignUp 
-                      ? 'Already have an account? Sign in' 
-                      : "Don't have an account? Create one"
-                    }
-                  </button>
+                  {isResetPassword ? (
+                    <button
+                      type="button"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#667eea',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                      onClick={() => {
+                        setIsResetPassword(false)
+                        setError('')
+                      }}
+                    >
+                      Back to Sign In
+                    </button>
+                  ) : (
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
+                    }}>
+                      <button
+                        type="button"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#667eea',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          textDecoration: 'underline'
+                        }}
+                        onClick={() => {
+                          setIsSignUp(!isSignUp)
+                          setError('')
+                        }}
+                      >
+                        {isSignUp 
+                          ? 'Already have an account? Sign in' 
+                          : "Don't have an account? Create one"
+                        }
+                      </button>
+                      {!isSignUp && (
+                        <button
+                          type="button"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#9ca3af',
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                            textDecoration: 'underline'
+                          }}
+                          onClick={() => {
+                            setIsResetPassword(true)
+                            setError('')
+                          }}
+                        >
+                          Forgot your password?
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </form>
+              )}
 
-              {isSignUp && (
+              {isSignUp && !isResetPassword && (
                 <div style={{
                   marginTop: '24px',
                   padding: '16px',
